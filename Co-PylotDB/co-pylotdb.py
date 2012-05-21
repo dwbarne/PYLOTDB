@@ -112,6 +112,7 @@ import glob                     # for batch processing all files with same exten
 import cPickle                  # for saving Python objects to file
 import platform                 # portable interface to platform information
 import yaml                     # for reading "co-pylotdb.conf" file
+import socket                   # for defining hostname on non-window non-posix machines
 
 # for debugging
 DEBUG = 0                       # = 1, general debugging
@@ -212,14 +213,16 @@ class AccessMySQL(Frame):
             self.computerName = os.environ['COMPUTERNAME']
         elif os.name == 'posix':
             self.userName = os.environ['USER']
-            self.computerName = os.environ['HOSTNAME']
+#            self.computerName = os.environ['HOSTNAME']
+            self.computerName = socket.gethostname()
         else:
             try:
                 self.userName = os.environ['USER']
             except:
                 self.userName = 'UNK'
             try:
-                self.computerName = os.environ['HOSTNAME']
+ #               self.computerName = os.environ['HOSTNAME']
+                self.computerName = socket.gethostname()
             except:
                 self.computerName = 'UNK'
                 
