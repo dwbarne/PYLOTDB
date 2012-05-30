@@ -5335,6 +5335,7 @@ class AccessMySQL(Frame):
             
         filename = self.scrolledtextOutputFile.get().strip()
         fnNoExtension, extension = os.path.splitext(filename)
+        outputfileEntry = self.scrolledtextOutputFile.get()
         if DEBUG:
             print('  > fnNoExtension = %s' % fnNoExtension)
             print('  > extension = %s' % extension)
@@ -5363,7 +5364,7 @@ class AccessMySQL(Frame):
             self.varEntry_ThatBeginWith.set(firstCharactersOfFileName)
         elif len(outputfileEntry) == 0:
             stringNoOutputFile = (
-                'No output file has been seleced.\n\n' +
+                'No output file has been selected.\n\n' +
                 'Select an output file and try again.'
                 )
             print(stringNoOutputFile)
