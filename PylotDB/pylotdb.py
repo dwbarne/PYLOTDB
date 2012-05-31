@@ -2720,6 +2720,7 @@ class PylotDB(Frame):
             sticky='e'+'w',
             )
         scrolledtextLicenseSandia.insert('0.0',licenseSandia)
+        scrolledtextLicenseSandia.component('text').configure(state=DISABLED)
             
         return            
     
