@@ -16,7 +16,7 @@ import Pmw          # for comboboxes, etc.
 import yaml         # for reading list of mail servers
 
 # debugging
-DEBUG = 0       # for printing selected variables
+DEBUG = 1       # for printing selected variables
 DEBUG_SERVERS = 0   # = 1 prints list of servers defined in email_dialog.conf file
 
 # list of mail servers;
@@ -49,21 +49,33 @@ if os.name == 'posix':
     pylotdbHomeDir = ''
     homeDir = '/home/' + userName
     file2find = 'pylotdb.py'
+    currentDir = os.getcwd()
     foundPylotDB = 0
-# do a directory tree walk, starting in home directory
-    for root, dirs, files in os.walk(homeDir):
-            for file in files:
-                if file2find == file:
-                    pylotdbHomeDir = root + '/'
-                    foundPylotDB = 1
+# start in current directory
+    if os.path.exists(file2find):
+        pylotdbHomeDir = os.getcwd() + '/'
+        foundPylotDB = 1
+        if DEBUG:
+            print('\npylotdbHomeDir found in current directory: %s' % pylotdbHomeDir)
+    if not foundPylotDB:
+# do a directory tree walk, starting in home directory; brute force methods take longer
+        for root, dirs, files in os.walk(homeDir):
+                for file in files:
+                    if file2find == file:
+                        pylotdbHomeDir = root + '/'
+                        foundPylotDB = 1
+                        if DEBUG:
+                            print('\npylotdbHomeDir found thru directory walk: %s' % pylotdbHomeDir)
+                        break
+                if foundPylotDB:
                     break
-            if foundPylotDB:
-                break
 
 # for windows, just use current directory; will be ok most of the time, unless
-#   an alias is used for "pylot.py"
+#   an alias is used for "pylotdb.py"
 else:
     pylotdbHomeDir = './'
+    if DEBUG:
+        print('\npylotdbHomeDir found in current directory (windows): %s' % pylotdbHomeDir)
             
 if pylotdbHomeDir == '':
     stringNoPylotDBHomeDir = (

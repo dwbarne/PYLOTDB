@@ -183,6 +183,7 @@ DEBUG_DISPLAYMESSAGE = 0        # = 1 print variables related to displaying msgs
 DEBUG_EDITSELECTEDROWS = 0              # = 1 print variables from editing selected rows
 DEBUG_EXTRACT_FILL_TEXT = 0             # = 1 print variables from Extract & Fill using text
 DEBUG_EXTRACT_FILL_YAML = 0             # = 1 print variables from Extract & Fill using yaml
+DEBUG_FINDHOMEDIR = 1                   # = 1 print home directory where pylotdb.py resides
 DEBUG_FORMNEWROWS_BUFFER = 0    # = 1 print variables related to forming a new row in buffer
 DEBUG_INSERT = 0                        # = 1 print variables related to inserting new rows into database
 DEBUG_INSERTROW = 0                     # = 1 print variables related to inserting rows into database table
@@ -907,19 +908,30 @@ class AccessMySQL(Frame):
             homeDir = '/home/' + self.userName
             file2find = 'pylotdb.py'
             foundPylotDB = 0
+# start in current directory
+            if os.path.exists(file2find):
+                pylotdbHomeDir = os.getcwd() + '/'
+                foundPylotDB = 1
+                if DEBUG_FINDHOMEDIR:
+                    print('\npylotdbHomeDir found in current directory (posix): %s' % pylotdbHomeDir)
+            if not foundPylotDB:
 # do a directory tree walk, starting in home directory
-            for root, dirs, files in os.walk(homeDir):
-                    for file in files:
-                        if file2find == file:
-                            pylotdbHomeDir = root + '/'
-                            foundPylotDB = 1
+                for root, dirs, files in os.walk(homeDir):
+                        for file in files:
+                            if file2find == file:
+                                pylotdbHomeDir = root + '/'
+                                foundPylotDB = 1
+                                if DEBUG_FINDHOMEDIR:
+                                    print('\npylotdbHomeDir found thru directory walk (posix): %s' % pylotdbHomeDir)
+                                break
+                        if foundPylotDB:
                             break
-                    if foundPylotDB:
-                        break
 # for windows, just use current directory; will be ok most of the time, unless
 #   an alias is used for "pylotdb.py"
         else:
             pylotdbHomeDir = './'
+            if DEBUG_FINDHOMEDIR:
+                print('\npylotdbHomeDir found in current directory (windows): %s' % pylotdbHomeDir)
             
         if pylotdbHomeDir == '':
             stringNoPylotDBHomeDir = (
