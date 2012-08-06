@@ -2415,7 +2415,7 @@ class AccessMySQL(Frame):
             self.frameMySQL_20_20_00,
             text='Copy/Paste\ncompile line\n(sample)',
             justify=RIGHT,
-            bg='tan',
+            bg=self.colorbg,
             fg='black',
             )
         self.labelCompileLine.grid(
@@ -2483,7 +2483,7 @@ class AccessMySQL(Frame):
             self.frameMySQL_20_20_01,
             text='Copy/Paste\nexecute line\n(sample)',
             justify=RIGHT,
-            bg='tan',
+            bg=self.colorbg,
             fg='black',
             )
         self.labelExecuteLine.grid(
@@ -2533,7 +2533,7 @@ class AccessMySQL(Frame):
             self.frameMySQL_21,
             text='User comments\n(approx 8,000 characters max; no double quotes)',
             justify=RIGHT,
-            bg='tan',
+            bg=self.colorbg,
             fg='black',
             )
         self.labelUserComment.grid(
@@ -6554,12 +6554,16 @@ if __name__ == '__main__':
     root.geometry(
         '+%d+%d' % (x_Windows, y_Windows) 
         )
-    app = AccessMySQL(root,'tan')
+    colorbg = 'gray'
+#    colorbg = 'tan'
+#    app = AccessMySQL(root,'tan')
+    app = AccessMySQL(root,colorbg)
     app.master.title(
        'Co-PylotDB: Transfer user files/data to MySQL database table'
         )
     app.master.configure(
-        bg='tan',
+#        bg='tan',
+        bg=colorbg
         )
     app.mainloop()      
             

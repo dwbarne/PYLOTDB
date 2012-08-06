@@ -16,7 +16,7 @@ import Pmw          # for comboboxes, etc.
 import yaml         # for reading list of mail servers
 
 # debugging
-DEBUG = 1       # for printing selected variables
+DEBUG = 0       # for printing selected variables
 DEBUG_SERVERS = 0   # = 1 prints list of servers defined in email_dialog.conf file
 
 # list of mail servers;

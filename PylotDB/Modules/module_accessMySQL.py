@@ -183,7 +183,7 @@ DEBUG_DISPLAYMESSAGE = 0        # = 1 print variables related to displaying msgs
 DEBUG_EDITSELECTEDROWS = 0              # = 1 print variables from editing selected rows
 DEBUG_EXTRACT_FILL_TEXT = 0             # = 1 print variables from Extract & Fill using text
 DEBUG_EXTRACT_FILL_YAML = 0             # = 1 print variables from Extract & Fill using yaml
-DEBUG_FINDHOMEDIR = 1                   # = 1 print home directory where pylotdb.py resides
+DEBUG_FINDHOMEDIR = 0                   # = 1 print home directory where pylotdb.py resides
 DEBUG_FORMNEWROWS_BUFFER = 0    # = 1 print variables related to forming a new row in buffer
 DEBUG_INSERT = 0                        # = 1 print variables related to inserting new rows into database
 DEBUG_INSERTROW = 0                     # = 1 print variables related to inserting rows into database table
