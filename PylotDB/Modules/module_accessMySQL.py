@@ -17409,18 +17409,33 @@ class AccessMySQL(Frame):
                     self.scrolledtext_EditSelectedRows_NewValues[i].get()
                     )
  
+ # look for auto_index field
+            flagAutoIndex = False
+            for eachItem in self.tableStructureOriginal:
+                if 'auto_index' in eachItem:
+                    flagAutoIndex = True
+                    break
+                    
 # update current values in window
 # ... get current table values
 # ...   assemble string to get field values
-            stringTableValues = (
-                "SELECT * FROM " + myDatabase + "." + myTable 
-                + ' order by auto_index'
-                )
+            if flagAutoIndex:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable 
+                    + ' order by auto_index'
+                    )
+            else:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable 
+                    )
+                    
 # ...   execute the command
             self.cursorHandleMySQL.execute(
                 stringTableValues
                 )
+                
             self.tableValues = self.cursorHandleMySQL.fetchall()
+            
 # ... update window current values
             myIndex = self.EditSelectedRows_Index
             self.EditSelectedRows_DisplayFields(
@@ -17637,19 +17652,34 @@ class AccessMySQL(Frame):
                 self.editSelectedRows_SaveNewValues.append(
                     self.scrolledtext_EditSelectedRows_NewValues[i].get()
                     )
+                    
+# look for auto_index field
+            flagAutoIndex = False
+            for eachItem in self.tableStructureOriginal:
+                if 'auto_index' in eachItem:
+                    flagAutoIndex = True
+                    break
             
 # update current values in window
 # ... get current table values
 # ...   assemble string to get field values
-            stringTableValues = (
-                "SELECT * FROM " + myDatabase + "." + myTable
-                + ' order by auto_index'
-                )
+            if flagAutoIndex:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable
+                    + ' order by auto_index'
+                    )
+            else:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable
+                    )
+                    
 # ...   execute the command
             self.cursorHandleMySQL.execute(
                 stringTableValues
                 )
+                
             self.tableValues = self.cursorHandleMySQL.fetchall()
+            
 # ... update window current values
             myIndex = self.EditSelectedRows_Index
             self.EditSelectedRows_DisplayFields(
@@ -17863,18 +17893,33 @@ class AccessMySQL(Frame):
                     self.scrolledtext_EditSelectedRows_NewValues[i].get()
                     )
  
+# look for auto_index field
+            flagAutoIndex = False
+            for eachItem in self.tableStructureOriginal:
+                if 'auto_index' in eachItem:
+                    flagAutoIndex = True
+                    break
+                    
 # update current values in window
 # ... get current table values
 # ...   assemble string to get field values
-            stringTableValues = (
-                "SELECT * FROM " + myDatabase + "." + myTable
-                + ' order by auto_index'
-                )
+            if flagAutoIndex:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable
+                    + ' order by auto_index'
+                    )
+            else:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable
+                    )
+                    
 # ...   execute the command
             self.cursorHandleMySQL.execute(
                 stringTableValues
                 )
+                
             self.tableValues = self.cursorHandleMySQL.fetchall()
+            
 # ... update window current values
             myIndex = self.EditSelectedRows_Index
             self.EditSelectedRows_DisplayFields(
@@ -19996,12 +20041,24 @@ class AccessMySQL(Frame):
                 self.scrolledtext_InputNewRows_NewValues[i].setvalue(
                     self.inputNewRows_SaveNewValues[i].strip()
                     )
+                    
+# look for auto_index field
+            flagAutoIndex = False
+            for eachItem in self.tableStructureOriginal:
+                if 'auto_index' in eachItem:
+                    flagAutoIndex = True
+                    break
               
 # ... get current table values
-            stringTableValues = (
-                "SELECT * FROM " + myDatabase + "." + myTable 
-                + ' order by auto_index'
-                )
+            if flagAutoIndex:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable 
+                    + ' order by auto_index'
+                    )
+            else:
+                stringTableValues = (
+                    "SELECT * FROM " + myDatabase + "." + myTable 
+                    )
                 
 # ...   execute the command
             self.cursorHandleMySQL.execute(
@@ -20535,22 +20592,56 @@ class AccessMySQL(Frame):
                             '  (Time: %-7.4f secs)' % delta_t
                             )
                             
+                        self.MySQL_Output(
+                            1,
+                            'Structure for table "' + myTable + '":'
+                            )
+                        self.MySQL_Output(
+                            0,
+                            self.tableStructureOriginal
+                            )
+                        self.MySQL_Output(
+                            0,
+                            ''
+                            )
+                            
+# look for auto_index field
+                        flagAutoIndex = False
+                        for eachItem in self.tableStructureOriginal:
+                            if 'auto_index' in eachItem:
+                                flagAutoIndex = True
+                                break
+                            
 # assemble string to get field values
+# ... limiter == 'all'
                         if limiter == 'all':
-                            stringTableValues = (
-                                "SELECT * FROM " + myDatabase + "." + myTable
-                                + ' order by auto_index'
-                                )
+                            if flagAutoIndex:
+                                stringTableValues = (
+                                    "SELECT * FROM " + myDatabase + "." + myTable
+                                    + ' order by auto_index'
+                                    )
+                            else:
+# if system table, it will NOT have an auto_index field
+                                stringTableValues = (
+                                    "SELECT * FROM " + myDatabase + "." + myTable
+                                    )
+# ... limiter == 'limit'
                         elif limiter == 'limit':
                             numberOfRowsToDisplay = rowsMaxNumber_Peek
                             if numberOfRowsToDisplay == 0:
                                 numberOfRowsToDisplay = 1
                             startAtRow = 0
-                            stringTableValues = (
-                            "SELECT * FROM " + myDatabase + "." + myTable
-                            + ' order by auto_index'
-                            " LIMIT " + str(startAtRow) + "," + str(numberOfRowsToDisplay)
-                            )
+                            if flagAutoIndex:
+                                stringTableValues = (
+                                    "SELECT * FROM " + myDatabase + "." + myTable
+                                    + ' order by auto_index'
+                                    " LIMIT " + str(startAtRow) + "," + str(numberOfRowsToDisplay)
+                                    )
+                            else:
+                                stringTableValues = (
+                                    "SELECT * FROM " + myDatabase + "." + myTable 
+                                    + " LIMIT " + str(startAtRow) + "," + str(numberOfRowsToDisplay)
+                                    )
 
 # form command string                            
                         self.MySQL_Commands(
@@ -25286,9 +25377,22 @@ class AccessMySQL(Frame):
             icount += 1
             self.dictColumnHeaders[self.tableStructure[i][0]] = icount
             
-        stringCommand += (
-            'FROM ' + self.myDatabase + '.' + self.myTable + ' order by auto_index'
-            )
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
+            
+        if flagAutoIndex:
+            stringCommand += (
+                'FROM ' + self.myDatabase + '.' + self.myTable 
+                + ' order by auto_index'
+                )
+        else:
+            stringCommand += (
+                'FROM ' + self.myDatabase + '.' + self.myTable 
+                )
            
 # print entire string
         self.MySQL_Commands(
@@ -48340,12 +48444,25 @@ class AccessMySQL(Frame):
 # define current database and table
         myDatabase = self.myDatabase
         myTable = self.myTable
+        
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
 
 # use for "table on server" selection
-        stringExtractFieldValue = (
-            'SELECT ' + varField + ' FROM ' + self.myDatabase + '.' + self.myTable
-            + ' order by auto_index'
-            )
+        if flagAutoIndex:
+            stringExtractFieldValue = (
+                'SELECT ' + varField + ' FROM ' + self.myDatabase + '.' + self.myTable
+                + ' order by auto_index'
+                )
+        else:
+            stringExtractFieldValue = (
+                'SELECT ' + varField + ' FROM ' + self.myDatabase + '.' + self.myTable
+                )
+            
         self.MySQL_Commands(
             1,
             stringExtractFieldValue
@@ -48854,12 +48971,25 @@ class AccessMySQL(Frame):
         dictSummary = {}
         
         if tableLocation == 'tableOnServer':
+
+# look for auto_index field
+            flagAutoIndex = False
+            for eachItem in self.tableStructureOriginal:
+                if 'auto_index' in eachItem:
+                    flagAutoIndex = True
+                    break
 # On server     
 # ... extract information from table on server
-            stringExtractFieldValue = (
-                'SELECT ' + varField + ' FROM ' + self.myDatabase + '.' + self.myTable
-                + ' order by auto_index'
-                )
+            if flagAutoIndex:
+                stringExtractFieldValue = (
+                    'SELECT ' + varField + ' FROM ' + self.myDatabase + '.' + self.myTable
+                    + ' order by auto_index'
+                    )
+            else:
+                stringExtractFieldValue = (
+                    'SELECT ' + varField + ' FROM ' + self.myDatabase + '.' + self.myTable
+                    )
+                
             self.MySQL_Commands(
                 1,
                 stringExtractFieldValue
@@ -51246,6 +51376,13 @@ class AccessMySQL(Frame):
             0,
             ''
             )
+            
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
 
 # to limit display, determine number of rows to display AND starting row number
         numberOfRowsToDisplay = self.comboboxMaxLinesToDisplay.get()
@@ -51270,11 +51407,18 @@ class AccessMySQL(Frame):
             
         startAtRow = 0
 # assemble string to get field values
-        stringTableValues = (
-            "SELECT * FROM " + myDatabase + "." + myTable + 
-            ' order by auto_index' +
-            " LIMIT " + str(startAtRow) + "," + str(numberOfRowsToDisplay)
-            )
+        if flagAutoIndex:
+            stringTableValues = (
+                "SELECT * FROM " + myDatabase + "." + myTable + 
+                ' order by auto_index' +
+                " LIMIT " + str(startAtRow) + "," + str(numberOfRowsToDisplay)
+                )
+        else:
+            stringTableValues = (
+                "SELECT * FROM " + myDatabase + "." + myTable
+                + " LIMIT " + str(startAtRow) + "," + str(numberOfRowsToDisplay)
+                )
+                
         self.MySQL_Commands(
             1,
             'self.cursorHandleMySQL.execute("' + stringTableValues + '")'
@@ -51495,15 +51639,30 @@ class AccessMySQL(Frame):
             0,
             ''
             )
+            
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
 
 # assemble string to get field values
-        stringTableValues = (
-            "SELECT * FROM " + myDatabase + "." + myTable + ' order by auto_index'
-            )
+        if flagAutoIndex:
+            stringTableValues = (
+                "SELECT * FROM " + myDatabase + "." + myTable 
+                + ' order by auto_index'
+                )
+        else:
+            stringTableValues = (
+                "SELECT * FROM " + myDatabase + "." + myTable
+                )
+                
         self.MySQL_Commands(
             1,
             'self.cursorHandleMySQL.execute("' + stringTableValues + '")'
             )
+            
 # execute the command
         start=time.time()
         self.cursorHandleMySQL.execute(
@@ -54477,9 +54636,9 @@ class AccessMySQL(Frame):
                 'Error: no numerical fields found',
                 '\nNo numerical fields have been found in the' + '\n' +
                 'CURRENTLY DISPLAYED table fields.' + '\n\n' +
-                'HINT: To search all fields, click on' + '\n' +
-                '  "Refresh complete table" button first, then click' + '\n' +
-                '  on "Show Numerical Fields Only". ' + '\n\n'
+                'HINT: To search all fields, click either' + '\n' +
+                '  "Peek" or "Load All" button first, then click' + '\n' +
+                '  "Show Numerical Fields Only". ' + '\n\n'
                 )
             return
             
@@ -54616,9 +54775,9 @@ class AccessMySQL(Frame):
                 'Error: no text fields found',
                 '\nNo text fields have been found in the' + '\n' +
                 'CURRENTLY DISPLAYED table fields.' + '\n\n' + 
-                'HINT: To search all fields, click on' + '\n' +
-                '  "Refresh complete table" button first, then click' + '\n' +
-                '  on "Show Text Fields Only". ' + '\n\n'
+                'HINT: To search all fields, click either' + '\n' +
+                '  "Peek" or "Load All" button first, then click' + '\n' +
+                '  "Show Text Fields Only". ' + '\n\n'
                 )
             return
             
@@ -55092,12 +55251,25 @@ class AccessMySQL(Frame):
             self.resequenceAutoIncrementPrimaryKeyField(
                 self.toplevelSelectDisplayOrderedFields
                 )
+                
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
  
-# get all values from database table              
-        stringGetAllFields = (
-            'SELECT * FROM ' + self.myDatabase + '.' + self.myTable
-            + ' order by auto_index'
-            )
+# get all values from database table      
+        if flagAutoIndex:
+            stringGetAllFields = (
+                'SELECT * FROM ' + self.myDatabase + '.' + self.myTable
+                + ' order by auto_index'
+                )
+        else:
+            stringGetAllFields = (
+                'SELECT * FROM ' + self.myDatabase + '.' + self.myTable
+                )
+                
         self.cursorHandleMySQL.execute(stringGetAllFields)
         self.tableValues = self.cursorHandleMySQL.fetchall()
         self.tableValuesOriginal = self.tableValues
@@ -56876,17 +57048,31 @@ class AccessMySQL(Frame):
             if valueFromTable <> None and valueFromTable <> '':
                 listColumnValues.append(valueFromTable)
         '''
-                
+
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
+                                
 # this code finds values from the entire table on the server
 # extract information from table on server
-        stringExtractFieldValue = (
-            'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
-            + ' order by auto_index'
-            )
+        if flagAutoIndex:
+            stringExtractFieldValue = (
+                'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
+                + ' order by auto_index'
+                )
+        else:
+            stringExtractFieldValue = (
+                'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
+                )
+                
         self.MySQL_Commands(
             1,
             stringExtractFieldValue
             )
+            
         start = time.time()
         self.cursorHandleMySQL.execute(
             stringExtractFieldValue
@@ -57116,12 +57302,25 @@ class AccessMySQL(Frame):
                 listColumnValues.append(valueFromTable)
         '''
         
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
+        
 # this code finds values from the entire table on the server
 # extract information from table on server
-        stringExtractFieldValue = (
-            'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
-            + ' order by auto_index'
-            )
+        if flagAutoIndex:
+            stringExtractFieldValue = (
+                'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
+                + ' order by auto_index'
+                )
+        else:
+            stringExtractFieldValue = (
+                'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
+                )
+                
         self.MySQL_Commands(
             1,
             stringExtractFieldValue
@@ -57355,16 +57554,30 @@ class AccessMySQL(Frame):
                 listColumnValues.append(valueFromTable)
         '''
         
+# look for auto_index field
+        flagAutoIndex = False
+        for eachItem in self.tableStructureOriginal:
+            if 'auto_index' in eachItem:
+                flagAutoIndex = True
+                break
+        
 # this code finds values from the entire table on the server
 # extract information from table on server
-        stringExtractFieldValue = (
-            'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
-            + ' order by auto_index'
-            )
+        if flagAutoIndex:
+            stringExtractFieldValue = (
+                'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
+                + ' order by auto_index'
+                )
+        else:
+            stringExtractFieldValue = (
+                'SELECT ' + keyfieldName + ' FROM ' + self.myDatabase + '.' + self.myTable
+                )
+                
         self.MySQL_Commands(
             1,
             stringExtractFieldValue
             )
+            
         start = time.time()
         self.cursorHandleMySQL.execute(
             stringExtractFieldValue
