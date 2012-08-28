@@ -83,6 +83,8 @@ versionPython = platform.python_version()
 
 # module search path
 if os.name == 'posix':
+# NOTE: for Mac users, use '/Users/' instead of '/home/' below; 
+# ... (I don't know how to tell the difference between Linux 'posix' and Mac 'posix')
     pylotdbHOME = '/home/' + os.environ['USER'] + '/PylotDB'
     sys.path.append(pylotdbHOME + '/Modules')
     if DEBUG_MODULE_PATH:

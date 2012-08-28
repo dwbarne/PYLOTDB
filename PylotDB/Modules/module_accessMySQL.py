@@ -205,6 +205,7 @@ DEBUG_QUIKSELECT = 0                # = 1 print variables related to Quik Select
 DEBUG_REFRESHFIELDS = 0         # = 1 print MySQL Fields for selected Database and Table
 DEBUG_REFRESHREFERENCECURVELIST_SCATTER = 0 # = 1 print variable related to reference curve list for scatter plots
 DEBUG_REPLACE = 0                       # = 1 print variables from replacing a row in a table
+DEBUG_REPLACECHAR = 1              # = 1 print new string with substituted special characters for YAML fill & extraction
 DEBUG_RESEQUENCE_AUTO_INDEX = 0         # = 1 print variables from resequencing auto_index primary key field
 DEBUG_RESTORE = 0                       # = 1 print variables related to database/table restore
 DEBUG_RESTORE_CHECKED_FIELD_NAMES = 0 # =1 print variables related to restoring fields to checked status
@@ -19889,22 +19890,22 @@ class AccessMySQL(Frame):
             if DEBUG_INSERTROW:
                 print('\nFIELDNAMESTOUPDATE = %s' % fieldNamesToUpdate)
 
-# form insert string
+# form update string
             stringUpdateSet = (
             "UPDATE " + myDatabase + "." + myTable + ' SET '
             )
             
-# get the most recent auto_index after executing the INSERT statement;
+# get the most recent auto_index after executing the UPDATE statement;
 #   there is no other reliable way of getting this number!
             stringGetAutoIndex = "select last_insert_id()"
             self.cursorHandleMySQL.execute(stringGetAutoIndex)
             autoIndex = self.cursorHandleMySQL.fetchall()[0][0]  # tuple with zeroth element
  
 # table rows are not listing in correct order
-# check other INSERT statements that need auto_index and revise as above
+# check other UPDATE statements that need auto_index and revise as above
 
             if DEBUG_INSERTROW:
-                print('\ncurrent auto_index based on INSERT statement: %s' % autoIndex)
+                print('\ncurrent auto_index based on UPDATE statement: %s' % autoIndex)
             
             stringAutoIndex = ' where auto_index = ' + str(autoIndex)
             
@@ -20369,10 +20370,14 @@ class AccessMySQL(Frame):
 #                self.toplevelTableValues.destroy()  
                 self.handlerDestroyToplevelTableValues()
                 
+# close "Filter Table" window
+# ... (leave open; uncomment below to close this window, but better if left open)
+                '''
                 try:
                     self.toplevelSelectDisplayOrderedFields.destroy()
                 except:
                     pass
+                '''
                     
                 try:
                     self.toplevelQuikSelectXY.destroy()
@@ -58400,14 +58405,30 @@ class AccessMySQL(Frame):
         '''
         if DEBUG_PRINT_METHOD:
             print('\n** In ' + MODULE + '/' + 'handlerDestroyToplevelTableValues')
-            
- 
-        
-# destroy "Table Filter" window if open
+                
+# destroy "Table Filter" window if open, but ask first
+# ... (let user close it if needed, so comment the following section)
+        '''
         try:
-            self.toplevelSelectDisplayOrderedFields.destroy()
+            mappedFilter = self.toplevelSelectDisplayOrderedFields.winfo_exists()
         except:
-            pass
+            mappedFilter = False
+            
+        if mappedFilter:
+            stringAskToCloseMappedFilter = (
+                'The Filter window is open!\n\n' +
+                'Close it?'
+                )
+            ans = askyesno(
+                'Question: close filter window?',
+                stringAskToCloseMappedFilter
+                )
+            if ans:
+                try:
+                    self.toplevelSelectDisplayOrderedFields.destroy()
+                except:
+                    pass
+        '''
             
 # kill the Quik-Select window if open
         self.handlerQuikSelectCancelWindow()   
@@ -71393,10 +71414,12 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=W,
             )
+            
         self.varButtonExtractAllOrSelectRows = StringVar()
         self.varButtonExtractAllOrSelectRows.set(
             'all'
             )
+            
         buttonExtractAll = Radiobutton(
             frame_02_10,
             text='All rows in table',
@@ -71411,6 +71434,22 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=W,
             )
+            
+        buttonExtractDisplayedRows = Radiobutton(
+            frame_02_10,
+            text='Displayed rows only',
+            bg=colorbg,
+            variable=self.varButtonExtractAllOrSelectRows,
+            value='displayed',
+            )
+        buttonExtractDisplayedRows.grid(
+            row=1,
+            column=0,
+            padx=0,
+            pady=0,
+            sticky=W,
+            )
+            
         buttonExtractSelectRows = Radiobutton(
             frame_02_10,
             text='Selected rows only',
@@ -71419,12 +71458,13 @@ class AccessMySQL(Frame):
             value='select',
             )
         buttonExtractSelectRows.grid(
-            row=1,
+            row=2,
             column=0,
             padx=0,
             pady=0,
             sticky=W,
             )
+            
 # ... frame_05: label for 'Choose protocol...'            
         stringProtocolTitle = (
 #            'Choose protocol for extracting data from the table field:'
@@ -72600,9 +72640,18 @@ class AccessMySQL(Frame):
             
 # determine which rows are involved
         row_numbers_Affected = []
+        
+# ALL ROWS
         if self.varButtonExtractAllOrSelectRows.get().strip() == 'all':
-#            row_numbers_Affected = len(self.tableValuesOriginal)
+# get values from database table
+            totalRows = self.totalRowsInTable()
+            row_numbers_Affected = range(totalRows)
+            
+# DISPLAYED ROWS ONLY         
+        elif self.varButtonExtractAllOrSelectRows.get().strip() == 'displayed':
             row_numbers_Affected = range(len(self.tableValues))
+            
+# SELECTED ROWS ONLY     
         elif self.varButtonExtractAllOrSelectRows.get().strip() == 'select':
             rowcount = 0
 # check if any rows are checked
@@ -72634,6 +72683,7 @@ class AccessMySQL(Frame):
                 if var.get():
                     row_numbers_Affected.append(rowcount)
                 rowcount += 1
+                
         if DEBUG_YAML or DEBUG_TEXT_REGEX:
             print('row_numbers_Affected for extraction and fill:\n%s' % row_numbers_Affected)
         
@@ -72655,33 +72705,70 @@ class AccessMySQL(Frame):
             print('listAutoIndexValuesAffected:')
             print listAutoIndexValuesAffected
         '''
-# get auto_index values from DISPLAYED table, not from table in database
+# get auto_index values from DISPLAYED table, not from table on database server
         listAutoIndexValuesAffected = []
-        for (k,v) in self.dictColumnHeaders.iteritems():
-            if k == 'auto_index':
-                if DEBUG_AUTOINDEX:
-                    print('\n> Found: key = %s, column location = %s' % (k,v))
+        
+        if (
+        self.varButtonExtractAllOrSelectRows.get().strip() == 'displayed'
+        or
+        self.varButtonExtractAllOrSelectRows.get().strip() == 'selected'
+        ):
+            for (k,v) in self.dictColumnHeaders.iteritems():
+                if k == 'auto_index':
+                    if DEBUG_AUTOINDEX:
+                        print('\n> Found: key = %s, column location = %s' % (k,v))
 #                for row in range(len(self.tableValues)):
-                for row in row_numbers_Affected:
-                    listAutoIndexValuesAffected.append(self.tableValues[row][int(v) - 1])
-                break
-                
-        if k <> 'auto_index':
-            stringNoAutoIndex = (
-                'No "auto_index" column could be found in the current table.\n\n' +
-                'Every table in PylotDB must have such a column.\n\n' +
-                'This is a coding error. Please contact code administrator.'
-                )
-            print(stringNoAutoIndex)
-            self.MySQL_Output(
-                0,
-                stringNoAutoIndex
-                )
-            showerror(
-                'Error: no auto_index column',
-                stringNoAutoIndex
-                )
-            return
+                    for row in row_numbers_Affected:
+                        listAutoIndexValuesAffected.append(self.tableValues[row][int(v) - 1])
+                    break
+                    
+            if k <> 'auto_index':
+                stringNoAutoIndex = (
+                    'No "auto_index" column could be found in the current table.\n\n' +
+                    'Every table in PylotDB must have such a column.\n\n' +
+                    'This is a coding error. Please contact code administrator.'
+                    )
+                print(stringNoAutoIndex)
+                self.MySQL_Output(
+                    0,
+                    stringNoAutoIndex
+                    )
+                showerror(
+                    'Error: no auto_index column',
+                    stringNoAutoIndex
+                    )
+                return
+                    
+        elif self.varButtonExtractAllOrSelectRows.get().strip() == 'all':
+            try:
+                stringAutoIndexValues = 'select auto_index from ' + self.myDatabase + '.' + self.myTable
+                self.cursorHandleMySQL.execute(stringAutoIndexValues)
+                listAutoIndexValuesAffected = list(self.cursorHandleMySQL.fetchall())  #turn tuple into a list
+            except:
+                stringNoAutoIndexFoundOnServer = (
+                    'There was a problem selecting the "auto_index" field from\n\n' +
+                    '  DATABASE: %s\n' +
+                    '  TABLE: %s\n\n' +
+                    'during the Extract & Fill process.\n\n' +
+                    'Exact reason is unknown, but possibly due to\n' +
+                    ' - no "auto_index" field exists in table\n' +
+                    ' - database server is down\n' +
+                    ' - database and/or table no longer exists\n\n' +
+                    'This process is halted -- returning to main program.'
+                    )
+                print('\n' + stringNoAutoIndexFoundOnServer)
+                try:
+                    showerror(
+                        'Error: problem selecting "auto_index" field',
+                        stringNoAutoIndexFoundOnServer,
+                        parent=self.toplevelTableValues
+                        )
+                except:
+                    showerror(
+                        'Error: problem selecting "auto_index" field',
+                        stringNoAutoIndexFoundOnServer
+                        )
+                return
             
         if DEBUG_TEXT_REGEX:
             print('\nlistAutoIndexValuesAffected in current table:\n%s' % listAutoIndexValuesAffected)
@@ -72709,7 +72796,7 @@ class AccessMySQL(Frame):
             listColumnHeaders_Current = listColumnHeaders_Original
             
 # loop over designated rows
-            for row in row_numbers_Affected:
+            for (index, row) in enumerate(row_numbers_Affected):
 # define empty list for yaml.load of input object
                 yamlColumnLoad = []
 # list of all items extracted from yaml-formatted file; define empty list first
@@ -72719,7 +72806,62 @@ class AccessMySQL(Frame):
 # ... check for empty field first; if so, or if error encountered, just skip over, 
 #       but don't halt loop as other fields may NOT be empty
                 try:
-                    yamlObject = self.tableValues[row][columnNumber].strip()
+                    if (
+                    self.varButtonExtractAllOrSelectRows.get().strip() == 'displayed'
+                    or
+                    self.varButtonExtractAllOrSelectRows.get().strip() == 'selected'
+                    ):
+# select yaml object from displayed table
+                        yamlObject = self.tableValues[row][columnNumber].strip()
+                        
+                    elif self.varButtonExtractAllOrSelectRows.get().strip() == 'all':
+# get column heading from 'columnNumber', since currently displayed columnNumber may not
+#   correspond to the one on the server
+                        columnHeading = self.dictColumnHeaders[columnNumber]
+# find same column heading in table on server
+                        stringTableStructure = (
+                            'SHOW COLUMNS FROM ' + self.myDatabase + '.' + self.myTable
+                            )
+                        self.cursorHandleMySQL.execute(stringTableStructure)
+                        structureTable = self.cursorHandleMySQL.fetchall()
+                        columnNumber_Count = 0
+                        columnNumber_All = -1
+                        for i in range(len(structureTable)):
+                            if columnHeading == structureTable[columnNumber_Count][0]:
+                                columnNumber_All = columnNumber_Count
+                                break
+                            columnNumber_Count += 1
+                        if columnNumber_All == -1:
+                            stringNoColumnHeadingFound = (
+                                'No column heading of\n\n' +
+                                '  "%s"\n\n' +
+                                'was found in table\n\n' +
+                                '  %s\n\n' +
+                                'on the server. This should NOT have happened!\n\n' +
+                                'Check coding in method\n\n' +
+                                ' %s\n\n' +
+                                'in module\n\n' +
+                                '%s'
+                                ) % (
+                                columnHeading,
+                                self.myTable,
+                                'def handlerExtractDataAndFillTable_AllFieldsAtOnce',
+                                'module_accessMySQL.py'
+                                )
+                            print('\n' + stringNoColumnHeadingFound)
+                            showerror(
+                                'Error: no column heading found',
+                                stringNoColumnHeadingFound
+                                )
+                            return
+                            
+                        autoIndexValue = listAutoIndexValuesAffected[index]
+# select yaml object from table on server
+                        stringSelectRow = 'select * from ' + self.myDatabase + '.' + self.myTable + \
+                            ' where auto_index=' + str(int(listAutoIndexValuesAffected[index]))
+                        self.cursorHandleMySQL.exectue(stringSelectRow)
+                        yamlObject = self.cursorHandleMySQL.fetchall()[columnNumber_All]
+                        
 # allow for empty entry in selected column; if so, continue looping thru rows
                     if yamlObject == '':
                         continue
@@ -72731,7 +72873,7 @@ class AccessMySQL(Frame):
                         'Row: %s\n' +
                         'Column: %s\n' +
                         'Continuing ...\n'
-                        ) % (str(eval(row) + 1),str(columnNumber))
+                        ) % (row + 1,str(columnNumber))
                     print stringYamlObjectError
                     showerror(
                         'Error: YAML object',
@@ -72916,17 +73058,10 @@ class AccessMySQL(Frame):
                                     if DEBUG_YAML:
                                         print '%sb.         subItem_2 = %s' % (icount, subItem_2) 
 #                            listAllItems.append(subItem_2 + ',' + type(subItem_2[1]))
-# formulate column header for database table; must not have special characters or spaces,
+# formulate column header for database table; must NOT have special characters or spaces,
 #   so replace any of these
                                     stringListTemp = ((string1 + '_' + string2 + '_' + subItem_2[0]).replace(' ','_'))
-                                    stringListTemp = stringListTemp.replace('/','_')
-                                    stringListTemp = stringListTemp.replace('\\','_')
-                                    stringListTemp = stringListTemp.replace('-','_')
-                                    stringListTemp = stringListTemp.replace('(','')
-                                    stringListTemp = stringListTemp.replace(')','')
-                                    stringListTemp = stringListTemp.replace('.','')
-                                    stringListTemp = stringListTemp.replace('%','percent')
-                                    stringListTemp = stringListTemp.replace(',','') 
+                                    stringListTemp = self.replaceSpecialCharacters(stringListTemp)
 # insert new column header into listTemp; must be lowercase (SQL does not 
 #   recognize uppercase), and 64 chars or less                               
                                     listTemp = [stringListTemp.lower()]
@@ -72950,14 +73085,7 @@ class AccessMySQL(Frame):
                             else:   # for two level dictionaries
 #                        listAllItems.append(subItem_1 + ',' + type(subItem_1[1]))
                                 stringListTemp = ((string1 + '_' + subItem_1[0]).replace(' ','_'))
-                                stringListTemp = stringListTemp.replace('/','_')
-                                stringListTemp = stringListTemp.replace('\\','_')
-                                stringListTemp = stringListTemp.replace('-','_')
-                                stringListTemp = stringListTemp.replace('(','')
-                                stringListTemp = stringListTemp.replace(')','')
-                                stringListTemp = stringListTemp.replace('.','')
-                                stringListTemp = stringListTemp.replace('%','percent')
-                                stringListTemp = stringListTemp.replace(',','')
+                                stringListTemp = self.replaceSpecialCharacters(stringListTemp)
                                 listTemp = [stringListTemp.lower()]
 #                                listTemp = [((string1 + '_' + subItem_1[0]).replace(' ','_')).lower()]
                                 if len(listTemp) > 64:
@@ -72975,14 +73103,7 @@ class AccessMySQL(Frame):
                                 continue
                     else:   # for one-level dictionaries
                         stringListTemp = ((item[0]).replace(' ','_'))
-                        stringListTemp = stringListTemp.replace('/','_')
-                        stringListTemp = stringListTemp.replace('\\','_')
-                        stringListTemp = stringListTemp.replace('-','_')
-                        stringListTemp = stringListTemp.replace('(','')
-                        stringListTemp = stringListTemp.replace(')','')
-                        stringListTemp = stringListTemp.replace('.','')
-                        stringListTemp = stringListTemp.replace('%','percent')
-                        stringListTemp = stringListTemp.replace(',','')
+                        stringListTemp = self.replaceSpecialCharacters(stringListTemp)
                         listTemp = [stringListTemp.lower()]
 #                        listTemp = [((item[0]).replace(' ','_')).lower()]
                         if len(listTemp) > 64:
@@ -73245,8 +73366,8 @@ class AccessMySQL(Frame):
                             if not ans:
                                 return
 
-# UPDATE TABLE VALUES USING 'INSERT' STATEMENT                                
-# form table insert statement using header names specifically; loop over list
+# UPDATE TABLE VALUES USING 'UPDATE' STATEMENT                                
+# form table update statement using header names specifically; loop over list
                 indexLast = len(listAllYamlHeaders) - 1
                 lastItemHeader = listAllYamlHeaders[indexLast]
                 lastItemValue = listAllYamlValues[indexLast]
@@ -73998,9 +74119,18 @@ class AccessMySQL(Frame):
             
 # determine which rows are involved
         row_numbers_Affected = []
+        
+# ALL ROWS
         if self.varButtonExtractAllOrSelectRows.get().strip() == 'all':
-#            row_numbers_Affected = len(self.tableValuesOriginal)
+# get values from database table
+            totalRows = self.totalRowsInTable()
+            row_numbers_Affected = range(totalRows)
+            
+# DISPLAYED ROWS ONLY
+        elif self.varButtonExtractAllOrSelectRows.get().strip() == 'displayed':
             row_numbers_Affected = range(len(self.tableValues))
+            
+# SELECTED ROWS ONLY
         elif self.varButtonExtractAllOrSelectRows.get().strip() == 'select':
             rowcount = 0
 # check if any rows are checked
@@ -74056,33 +74186,77 @@ class AccessMySQL(Frame):
 # get auto_index values from DISPLAYED table, not from table in database
 
         listAutoIndexValuesAffected = []
-        for (k,v) in self.dictColumnHeaders.iteritems():
-            if k == 'auto_index':
-                print('\n> Found: key = %s, column location = %s' % (k,v))
+        
+        if (
+        self.varButtonExtractAllOrSelectRows.get().strip() == 'displayed'
+        or
+        self.varButtonExtractAllOrSelectRows.get().strip() == 'selected'
+        ):
+            for (k,v) in self.dictColumnHeaders.iteritems():
+                if k == 'auto_index':
+                    print('\n> Found: key = %s, column location = %s' % (k,v))
 #                for row in range(len(self.tableValues)):
-                for row in row_numbers_Affected:
-                    listAutoIndexValuesAffected.append(self.tableValues[row][int(v) - 1])
-                break
+                    for row in row_numbers_Affected:
+                        listAutoIndexValuesAffected.append(self.tableValues[row][int(v) - 1])
+                    break
                 
-        if k <> 'auto_index':
-            stringNoAutoIndex = (
-                'No "auto_index" column could be found in the current table.\n\n' +
-                'Every table in PylotDB must have such a column.\n\n' +
-                'This is a coding error. Please contact code administrator.'
-                )
-            print(stringNoAutoIndex)
-            self.MySQL_Output(
-                0,
-                stringNoAutoIndex
-                )
-            showerror(
-                'Error: no auto_index column',
-                stringNoAutoIndex
-                )
-            return
+            if k <> 'auto_index':
+                stringNoAutoIndex = (
+                    'No "auto_index" column could be found in the current table.\n\n' +
+                    'Every table in PylotDB must have such a column.\n\n' +
+                    'This is a coding error. Please contact code administrator.'
+                    )
+                print(stringNoAutoIndex)
+                self.MySQL_Output(
+                    0,
+                    stringNoAutoIndex
+                    )
+                showerror(
+                    'Error: no auto_index column',
+                    stringNoAutoIndex
+                    )
+                return
+                
+        elif self.varButtonExtractAllOrSelectRows.get().strip() == 'all':
+            try:
+                stringAutoIndexValues = 'select auto_index from ' + self.myDatabase + '.' + self.myTable
+                self.cursorHandleMySQL.execute(stringAutoIndexValues)
+#turn tuple of tuples into a list like the other cases
+                tuplesAutoIndexValuesAffected = ()
+                tuplesAutoIndexValuesAffected = self.cursorHandleMySQL.fetchall() 
+                for index in range(len(tuplesAutoIndexValuesAffected)):
+                    listAutoIndexValuesAffected.append(tuplesAutoIndexValuesAffected[index][0])
+
+            except:
+                stringNoAutoIndexFoundOnServer = (
+                    'There was a problem selecting the "auto_index" field from\n\n' +
+                    '  DATABASE: %s\n' +
+                    '  TABLE: %s\n\n' +
+                    'during the Extract & Fill process.\n\n' +
+                    'Exact reason is unknown, but possibly due to\n' +
+                    ' - no "auto_index" field exists in table\n' +
+                    ' - database server is down\n' +
+                    ' - database and/or table no longer exists\n\n' +
+                    'This process is halted -- returning to main program.'
+                    )
+                print('\n' + stringNoAutoIndexFoundOnServer)
+                try:
+                    showerror(
+                        'Error: problem selecting "auto_index" field',
+                        stringNoAutoIndexFoundOnServer,
+                        parent=self.toplevelTableValues
+                        )
+                except:
+                    showerror(
+                        'Error: problem selecting "auto_index" field',
+                        stringNoAutoIndexFoundOnServer
+                        )
+                return
             
         if DEBUG_TEXT_REGEX:
             print('\nlistAutoIndexValuesAffected in current table:\n%s' % listAutoIndexValuesAffected)
+            
+        print('\nDWB: listAutoIndexValuesAffected in current table\n%s' % listAutoIndexValuesAffected)
 
 # get list of column headers from "self.dictColumnHeadersOriginal" which
 #   are ALL the column headers in the database table, not just the displayed table
@@ -74111,14 +74285,15 @@ class AccessMySQL(Frame):
             totalHeadersAdded = 0
                        
 # setup a sequential index
-            indexCounter = 0
+###            indexCounter = 0
             
 # loop over designated rows
-            for row in row_numbers_Affected:
+            for (index,row) in enumerate(row_numbers_Affected):
 # print row number to keep track of what's happening
                 print('\n>> Updating row #%s' % (row + 1))
 # listAutoIndexValuesAffected is sequentially indexed, so use a counter
-                indexCounter += 1
+###                indexCounter += 1
+
 # define empty list for yaml.load of input object
                 yamlColumnLoad = []
 # list of all items extracted from yaml-formatted file; define empty list first
@@ -74128,21 +74303,133 @@ class AccessMySQL(Frame):
 # ... check for empty field first; if so, or if error encountered, just skip over, 
 #       but don't halt loop as other fields may NOT be empty
                 try:
-                    yamlObject = self.tableValues[row][columnNumber].strip()
+                    if (
+                    self.varButtonExtractAllOrSelectRows.get().strip() == 'displayed'
+                    or
+                    self.varButtonExtractAllOrSelectRows.get().strip() == 'selected'
+                    ):
+# select yaml object from displayed table
+                        yamlObject = self.tableValues[row][columnNumber].strip()
+                        
+                    elif self.varButtonExtractAllOrSelectRows.get().strip() == 'all':
+ # get column heading from 'columnNumber', since currently displayed columnNumber may not
+#   correspond to the one on the server
+                        columnHeading = ''
+                        for (k,v) in self.dictColumnHeaders.iteritems():
+                            if v == columnNumber:
+                                columnHeading = k
+                                break
+                                
+                        if columnHeading == '':
+                            stringColumnHeadingNotFound = (
+                                'No column heading was found in table\n\n' +
+                                '  %s\n\n' +
+                                'for column number %s.\n\n' +
+                                'This should NOT have happened.\n\n' +
+                                'Please check coding in method\n\n' +
+                                '  %s\n\n' +
+                                'in module\n\n' +
+                                '  %s\n\n' +
+                                'Returning to main program.'
+                                )
+                            print('\n' + stringColumnHeadingNotFound)
+                            try:
+                                showerror(
+                                    'Error: no column heading found',
+                                    stringColumnHeadingNotFound,
+                                    parent=self.toplevelTableValues
+                                    )
+                            except:
+                                showerror(
+                                    'Error: no column heading found',
+                                    stringColumnHeadingNotFound,
+                                    )
+                            return
+                             
+                        print('\nDWB: columnHeading = %s' % columnHeading)
+                                
+# find same column heading in table on server
+                        stringTableStructure = (
+                            'SHOW COLUMNS FROM ' + self.myDatabase + '.' + self.myTable
+                            )
+                            
+                        print('\nDWB: command to show columns:\n' )
+                        print(stringTableStructure)
+                        
+                        self.cursorHandleMySQL.execute(stringTableStructure)
+                        structureTable = self.cursorHandleMySQL.fetchall()
+                        
+                        print('\nDWB: structureTable = ')
+                        print(structureTable)
+                        
+                        columnNumber_Count = 0
+                        columnNumber_All = -1
+                        for i in range(len(structureTable)):
+                            if columnHeading == structureTable[columnNumber_Count][0]:
+                                columnNumber_All = columnNumber_Count
+                                break
+                            columnNumber_Count += 1
+                        if columnNumber_All == -1:
+                            stringNoColumnHeadingFound = (
+                                'No column heading of\n\n' +
+                                '  "%s"\n\n' +
+                                'was found in table\n\n' +
+                                '  %s\n\n' +
+                                'on the server. This should NOT have happened!\n\n' +
+                                'Check coding in method\n\n' +
+                                ' %s\n\n' +
+                                'in module\n\n' +
+                                '%s'
+                                ) % (
+                                columnHeading,
+                                self.myTable,
+                                'def handlerExtractDataAndFillTable_AllFieldsAtOnce',
+                                'module_accessMySQL.py'
+                                )
+                            print('\n' + stringNoColumnHeadingFound)
+                            showerror(
+                                'Error: no column heading found',
+                                stringNoColumnHeadingFound
+                                )
+                            return
+                            
+                        autoIndexValue = listAutoIndexValuesAffected[index]
+# select yaml object from table on server
+                        stringSelectRow = 'select * from ' + self.myDatabase + '.' + self.myTable + \
+                            ' where auto_index=' + str(autoIndexValue)
+
+                        print('\nDWB: stringSelectRow:\n')
+                        print(stringSelectRow)
+                        
+                        self.cursorHandleMySQL.execute(stringSelectRow)
+                        returnObject = self.cursorHandleMySQL.fetchall()
+                        print('\nDWB: returnObject:\n')
+                        print(returnObject)
+#                        yamlObject = returnObject[0].[columnNumber_All]
+                        yamlObject = list(returnObject[0])[columnNumber_All + 1]
+                        print('\nDWB: yamlObject:\n')
+                        print('>> printing yaml object')
+                        print(yamlObject)
+                        print('\n>> now exiting')
+                        
+                        print('\nDWB: autoIndexValue = %s' % autoIndexValue)
+
+                        print('')
+                        
 # allow for empty entry in selected column; if so, continue looping thru rows
                     if yamlObject == '':
                         continue
                     if DEBUG_YAML:
-                        print('\n row %s, yamlValue = \n%s' % (row + 1,yamlObject))
+                        print('\n row %s, yamlObject = \n%s' % (row + 1,yamlObject))
 # ... skip over empty fields
                 except:
                     stringYamlObjectError = (
                         'Error accessing YAML object in database.\n'+
-                        'Row: %s\n' +
-                        'Column: %s\n' +
+                        '  Row: %s\n' +
+                        '  Column: %s\n' +
                         'Continuing ...\n'
-                        ) % (str(eval(row) + 1),str(columnNumber))
-                    print stringYamlObjectError
+                        ) % (row+ 1,str(columnNumber))
+                    print('\n' + stringYamlObjectError)
                     showerror(
                         'Error: YAML object',
                         stringYamlObjectError
@@ -74483,12 +74770,12 @@ class AccessMySQL(Frame):
 # show user first few lines of data which will be inserted into table if user continues
                 if DEBUG_YAML:
                     print('\niLinesPrint = %s\n' % iLinesPrint)
-                if iLinesPrint >= 1 and indexCounter == 1:
+                if iLinesPrint >= 1 and index == 0:
                     stringUserInfo = ''
                     stringUserInfo = (
                         'Showing first few lines of data to be added to\n' +
-                        ' table: %s\n' +
-                        ' row: %s\n' +
+                        ' TABLE: %s\n' +
+                        ' ROW: %s\n' +
                         'Format is (header_name, value, datatype)\n\n'
                         ) % (
                             self.myTable,
@@ -74513,8 +74800,9 @@ class AccessMySQL(Frame):
                             )
                         
                     stringUserInfo += (
+                        '\nNumber of rows affected: %s\n' +
                         '\nClick OK to continue, or Cancel to quit this operation'
-                        )
+                        ) % len(row_numbers_Affected)
                     try:
                         ans = askokcancel(
                             'Data snapshot - first row only',
@@ -74701,10 +74989,10 @@ class AccessMySQL(Frame):
                     stringMySQLUpdate += lastItemHeader + '=' + str(lastItemValue) + ' '
                 '''
                 
-                for index in range(len(listAllYamlValues)):
+                for indexYaml in range(len(listAllYamlValues)):
                     stringMySQLUpdate_Add_0 = ''
                     stringMySQLUpdate_Add_0 = (
-                        listAllYamlHeaders[index] + '=' + '\'' + str(listAllYamlValues[index]) + '\' '
+                        listAllYamlHeaders[indexYaml] + '=' + '\'' + str(listAllYamlValues[indexYaml]) + '\' '
                         )
 # special treatment at last item           
 #                stringMySQLUpdate += lastItemHeader + '=' + '\'' + str(lastItemValue) + '\' '
@@ -74712,13 +75000,13 @@ class AccessMySQL(Frame):
                     if DEBUG_YAML:
                         print
                         print('row = %s' % (row + 1))
-                        print('indexCounter = %s' % indexCounter)
-                        print('listAutoIndexValuesAffected[indexCounter-1] = %s'
-                            % listAutoIndexValuesAffected[indexCounter - 1]
+                        print('index = %s' % index)
+                        print('listAutoIndexValuesAffected[index] = %s'
+                            % listAutoIndexValuesAffected[index]
                             )
                         
 # add WHERE to string
-                    stringMySQLUpdate_Add_1 = 'where auto_index = ' + str(int(listAutoIndexValuesAffected[indexCounter - 1]))
+                    stringMySQLUpdate_Add_1 = 'where auto_index = ' + str(int(listAutoIndexValuesAffected[index]))
                     
                     stringMySQLUpdate_Total = (
                         stringMySQLUpdate + stringMySQLUpdate_Add_0 + stringMySQLUpdate_Add_1
@@ -74728,7 +75016,7 @@ class AccessMySQL(Frame):
                         print(
                             '%s. stringMySQLUpdate_Total = %s' 
                             ) % (
-                            index + 1,
+                            indexYaml + 1,
                             stringMySQLUpdate_Total
                             ) 
                         print(
@@ -74742,7 +75030,7 @@ class AccessMySQL(Frame):
                     try:
                         self.cursorHandleMySQL.execute(stringMySQLUpdate_Total)
                     except:
-                        if indexCounter == 1:
+                        if index == 0:
                             stringShowFields = (
                                 'SHOW COLUMNS FROM ' + self.myDatabase + '.' + self.myTable
                                 )
@@ -74751,7 +75039,7 @@ class AccessMySQL(Frame):
                             tempFieldList = []
                             for field in currentFieldsTuple:
                                 tempFieldList.append(field[0])
-                            indexField = tempFieldList.index(listAllYamlHeaders[index])                   
+                            indexField = tempFieldList.index(listAllYamlHeaders[indexYaml])                   
                             stringNoInsert = (
                                 'UPDATE error:\n\n' +
                                 '  database = %s\n' +
@@ -74767,7 +75055,7 @@ class AccessMySQL(Frame):
                                 self.myDatabase,
                                 self.myTable,
                                 row + 1,
-                                listAllYamlHeaders[index],
+                                listAllYamlHeaders[indexYaml],
 #                           index + 1,
                                 indexField + 1,
                                 stringMySQLUpdate_Total
@@ -74801,7 +75089,7 @@ class AccessMySQL(Frame):
                 ) % (
                 self.myTable,
                 totalHeadersAdded,
-                indexCounter,
+                index + 1,
 #                len(listMissingHeadersAndDatatype)
                 )
             print stringRefreshTable
@@ -74809,6 +75097,31 @@ class AccessMySQL(Frame):
                 'INFO: table refresh',
                 stringRefreshTable
                 )
+                
+# make sure window still exists
+            try:
+                mapped = self.toplevelTableValues.winfo_exists()
+            except:
+                mapped = False
+            if not mapped:
+                stringNoTableWindow = (
+                    'The table window is no longer displayed, so the table will\n' +
+                    'not be refreshed. However, any new table values will be\n' +
+                    'shown the next time the table window is displayed.'
+                    )
+                print('\n' + stringNoTableWindow)
+                try:
+                    showinfo(
+                        'Info: no table window',
+                        stringNoTableWindow,
+                        parent=self.toplevelTableFunctions
+                        )
+                except:
+                    showinfo(
+                         'Info: no table window',
+                        stringNoTableWindow
+                        )
+                return
                     
 # ... update status line
             maxLinesDisplay = int(self.comboboxMaxLinesToDisplay.get())
@@ -75482,6 +75795,33 @@ class AccessMySQL(Frame):
         return
         
         
+    def replaceSpecialCharacters(self,stringTemp):
+        '''
+        Purpose:
+            replace special characters so that MySQL can understand
+        '''
+     
+        if DEBUG_PRINT_METHOD:
+            print('\n** In ' + MODULE + '/' + 'replaceSpecialCharacters')   
+            
+        stringTemp = stringTemp.replace('/','_')                    # 1
+        stringTemp = stringTemp.replace('\\','_')                   # 2
+        stringTemp = stringTemp.replace('-','_')                    # 3
+        stringTemp = stringTemp.replace('(','')                      # 4
+        stringTemp = stringTemp.replace(')','')                      # 5
+        stringTemp = stringTemp.replace('.','')                      # 6 
+        stringTemp = stringTemp.replace('%','percent')        # 7
+        stringTemp = stringTemp.replace(',','')                      # 8
+        stringTemp = stringTemp.replace('[\'','"\'')                # 9
+        stringTemp = stringTemp.replace('\']','"\'')                # 10
+        stringTemp = stringTemp.replace('["','\'"')                 # 11
+        stringTemp = stringTemp.replace('"]','"\'')                 # 12
+        
+        if DEBUG_REPLACECHAR:
+            print('\nstringTemp = %s' % stringTemp)
+        
+        return stringTemp
+        
     def typeIt(self, var):
         '''
         Purpose:
@@ -75503,6 +75843,8 @@ class AccessMySQL(Frame):
             return 'TEXT'
         elif type(var) == long:
             return 'LONG'
+        elif type(var) == list:
+            return 'TEXT'
         else:
             stringTypeError = (
                 (
