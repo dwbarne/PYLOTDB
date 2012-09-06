@@ -226,7 +226,8 @@ DEBUG_TABLEISMAPPED = 0                 # = 1 print whether table is mapped (is 
 DEBUG_TABLES_REFRESH = 0                # = 1 print tables after refresh
 DEBUG_TABLE_VALUES = 0                  # = 1 print table values in output window
 DEBUG_TEXT_REGEX = 0                    # = 1 detailed printout of regex (regular expressions) extraction process; 0 = suppress
-DEBUG_USER_DEFINED_FIELDS = 0           # = 1 print some variables for user-defined fields for storage buffer
+DEBUG_USER_DEFINED_FIELDS = 0           # = 1 print some variables for user-defined fields for storage buffer for XY plots
+DEBUG_USER_DEFINED_FIELDS_SCATTER = 0           # = 1 print some variables for user-defined fields for storage buffer from scatter plots
 DEBUG_VARXYSELECT = 0                   # = 1 prints variables related to re-defining self.varXSelect and self.varYSelect when reading in new table
 DEBUG_XY = 0                                # = 1 print variables related to X-Y plots
 DEBUG_XY_LABELS = 0                     # = 1 print variables related to labels for X-Y plots
@@ -4831,7 +4832,8 @@ class AccessMySQL(Frame):
                 self.comboboxDbSelect.get().strip()
                 )
                 
-# if 'Backup and Restore' window exists, refresh current database field
+# if 'Backup and Restore' window exists, refresh current database field,
+#    and blank the field "and use filename"
         try:
             mapped4 = self.toplevelBackupRestore.winfo_exists()
         except:
@@ -4841,6 +4843,17 @@ class AccessMySQL(Frame):
                 self.comboboxDbSelect.get().strip()
                 )
             self.varBackupRestoreSelectTable.set('')
+            self.varBackupFileName.set('')
+            if self.varSelectBackup_TableFunctions.get() == 'all_databases_all_tables':
+                self.radiobuttonAllDatabasesAllTables_TableFunctions.invoke()
+            elif self.varSelectBackup_TableFunctions.get() == 'one_database_all_tables':
+                self.radiobuttonOneDatabaseAllTables_TableFunctions.invoke()
+            elif self.varSelectBackup_TableFunctions.get() == 'one_database_one_table':
+                self.radiobuttonOneDatabaseOneTable_TableFunctions.invoke()
+            elif self.varSelectBackup_TableFunctions.get() == 'structure_only':
+                self.radiobuttonStructureOnly_TableFunctions.invoke()            
+            else:
+                pass
                 
 # if 'Add Field' window exists, refresh current database field
         '''
@@ -59065,6 +59078,15 @@ class AccessMySQL(Frame):
 # (don't sort if numbering fields in order!
 #        listOfTextFields.sort()
 
+# determine list of all fields in current table
+        listOfAllFields = []
+        icount=0
+        for row in range(len(self.tableStructure)):
+            icount += 1
+            myField, myDatatype, myNull, myKey, myDefault, myExtra = \
+                self.tableStructure[row]
+            listOfAllFields.append(str(icount) + '. ' + myField)
+
         Pady = 5
 # ... first row, user defined fields
 #... zeroth row
@@ -59112,7 +59134,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_1 = Pmw.ComboBox(
             self.frame_30_UserDefinedFields,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -59212,7 +59235,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_2 = Pmw.ComboBox(
             self.frame_30_UserDefinedFields,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -59310,7 +59334,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_3 = Pmw.ComboBox(
             self.frame_30_UserDefinedFields,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -59408,7 +59433,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_4 = Pmw.ComboBox(
             self.frame_30_UserDefinedFields,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -59925,7 +59951,9 @@ class AccessMySQL(Frame):
             
 # determine list of text fields in current table
         listOfTextFields = []
+        icount = 0
         for row in range(len(self.tableStructure)):
+            icount += 1
 #            fieldType = self.tableStructure[row][1]
             myField, myDatatype, myNull, myKey, myDefault, myExtra = \
                 self.tableStructure[row]
@@ -59933,10 +59961,19 @@ class AccessMySQL(Frame):
 # check if text
             fieldNameIsText = self.checkIsFieldText(varfirst2)
             if fieldNameIsText:
-                listOfTextFields.append(myField) 
+                listOfTextFields.append(str(icount) + '. ' + myField) 
         
 # sort
-        listOfTextFields.sort()
+# (don't sort if numbering fields in order!
+#        listOfTextFields.sort()
+
+        listOfAllFields = []
+        icount=0
+        for row in range(len(self.tableStructure)):
+            icount += 1
+            myField, myDatatype, myNull, myKey, myDefault, myExtra = \
+                self.tableStructure[row]
+            listOfAllFields.append(str(icount) + '. ' + myField)
         
 # add plot title to dictionary for column headers; do it with deepcopy to keep separate
         self.dictColumnHeaders_Scatter = copy.deepcopy(self.dictColumnHeaders)
@@ -59990,7 +60027,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_1_Scatter = Pmw.ComboBox(
             self.frame_30_UserDefinedFields_Scatter,
-            scrolledlist_items=listOfTextFields,
+#           scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -60094,7 +60132,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_2_Scatter = Pmw.ComboBox(
             self.frame_30_UserDefinedFields_Scatter,
-            scrolledlist_items=listOfTextFields,
+#           scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -60192,7 +60231,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_3_Scatter = Pmw.ComboBox(
             self.frame_30_UserDefinedFields_Scatter,
-            scrolledlist_items=listOfTextFields,
+#           scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -60290,7 +60330,8 @@ class AccessMySQL(Frame):
 # ...       user-specified table field (text fields only) 
         self.comboboxDefinedField_4_Scatter = Pmw.ComboBox(
             self.frame_30_UserDefinedFields_Scatter,
-            scrolledlist_items=listOfTextFields,
+#           scrolledlist_items=listOfTextFields,
+            scrolledlist_items=listOfAllFields,
             listheight=125,
             entry_width=20,
             dropdown=1,
@@ -60323,7 +60364,7 @@ class AccessMySQL(Frame):
 # ...       value to store in buffer
         self.comboboxValueDefinedField_4_Scatter = Pmw.ComboBox(
             self.frame_30_UserDefinedFields_Scatter,
-            scrolledlist_items=self.listValuesDefinedField_3_Scatter,
+            scrolledlist_items=self.listValuesDefinedField_4_Scatter,
             dropdown=1,
             entry_state='disabled',
             entry_disabledbackground='white',
@@ -60641,18 +60682,22 @@ class AccessMySQL(Frame):
         return
         
          
-    def handlerValueField_1_Scatter(self,user_field_1):
+    def handlerValueField_1_Scatter(self,numbered_user_field_1):
         '''
         Purpose:
-            create list of values using user_field_1;
+            create list of values using numbered_user_field_1;
             list single value in value field
         '''
         if DEBUG_PRINT_METHOD:
             print('\n** In ' + MODULE + '/' + 'handlerValueField_1_Scatter')
             
+# get rid of number in front of 'numbered_user_field_1'
+        user_field_1 = numbered_user_field_1.split('.')[1].strip()
+            
 # de-select checkboxes
         self.varSV_1_Scatter.set(0)
         self.varMV_1_Scatter.set(0)
+        
 # get index number from self.dictColumnHeaders
         localDict = {}
         flagFindField = False
@@ -60660,16 +60705,15 @@ class AccessMySQL(Frame):
             if key == user_field_1:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
 
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_1 = %s was not found in the table,\n' +
+                'user_field_1 = %s was not found in the table,\n' +
                 '  probably indicating an improper selection.\n\n'
                 ) % user_field_1
-                )
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -60681,15 +60725,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_1_Scatter = list(localDict)
-            self.listValuesDefinedField_1_Scatter.sort()
-            print(
-                'self.listValuesDefinedField_1_Scatter = \n %s' %
-                self.listValuesDefinedField_1_Scatter
-                )
-            print(
-                'self.listValuesDefinedField_1_Scatter[0] = %s \n\n' % 
-                self.listValuesDefinedField_1_Scatter[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_1_Scatter)):
+                    tempList.append(eval(self.listValuesDefinedField_1_Scatter[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_1_Scatter = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_1_Scatter.append(str(tempList[index]))
+            except:
+# sort text
+                self.listValuesDefinedField_1_Scatter.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                print(
+                    '\nself.listValuesDefinedField_1_Scatter = \n %s' %
+                    self.listValuesDefinedField_1_Scatter
+                    )
+                print(
+                    '\nself.listValuesDefinedField_1_Scatter[0] = %s' % 
+                    self.listValuesDefinedField_1_Scatter[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_1_Scatter[0]) = %s' %
+                    type(self.listValuesDefinedField_1_Scatter[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_1_Scatter) = %s' % 
+                    len(self.listValuesDefinedField_1_Scatter)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_1_Scatter = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields_Scatter,
@@ -60707,14 +60780,8 @@ class AccessMySQL(Frame):
                 pady=5,
                 sticky=W,
                 )
-# set entry
-            if DEBUG_USER_DEFINED_FIELDS:
-                print('\nlen(self.listValuesDefinedField_1_Scatter = %s' % 
-                    len(self.listValuesDefinedField_1_Scatter)
-                    )
-                print('value = %s' % self.listValuesDefinedField_1_Scatter)
-            
-            
+                
+# set entry           
             if(
             len(self.listValuesDefinedField_1_Scatter) <> 0
             and
@@ -60755,18 +60822,22 @@ class AccessMySQL(Frame):
         return
 
         
-    def handlerValueField_2_Scatter(self,user_field_2):
+    def handlerValueField_2_Scatter(self,numbered_user_field_2):
         '''
         Purpose:
-            create list of values using user_field_2;
+            create list of values using numbered_user_field_2;
             list single value in value field
         '''
         if DEBUG_PRINT_METHOD:
             print('\n** In ' + MODULE + '/' + 'handlerValueField_2_Scatter')
             
+# get rid of number in front of 'numbered_user_field_1'
+        user_field_2 = numbered_user_field_2.split('.')[1].strip()
+            
 # de-select checkboxes
         self.varSV_2_Scatter.set(0)
         self.varMV_2_Scatter.set(0)
+        
 # get index number from self.dictColumnHeaders
         localDict = {}
         flagFindField = False
@@ -60774,16 +60845,15 @@ class AccessMySQL(Frame):
             if key == user_field_2:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
+                
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_2 = %s was not found in the table\n' +
-                '  indicating a coding error or possibly an\n' +
-                '  erroneous index.\n\n' +
-                'Please report this problem.') % user_field_2
-                )
+                'user_field_2 = %s was not found in the table,\n' +
+                '  probably indicating an improper selection.\n\n'
+                ) % user_field_2
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -60795,15 +60865,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_2_Scatter = list(localDict)
-            self.listValuesDefinedField_2_Scatter.sort()
-            print(
-                'self.listValuesDefinedField_2_Scatter = \n %s' %
-                self.listValuesDefinedField_2_Scatter
-                )
-            print(
-                'self.listValuesDefinedField_2_Scatter[0] = %s \n\n' % 
-                self.listValuesDefinedField_2_Scatter[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_2_Scatter)):
+                    tempList.append(eval(self.listValuesDefinedField_2_Scatter[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_2_Scatter = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_2_Scatter.append(str(tempList[index]))
+            except:
+# sort text   
+                self.listValuesDefinedField_2_Scatter.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                print(
+                    '\nself.listValuesDefinedField_2_Scatter = \n %s' %
+                    self.listValuesDefinedField_2_Scatter
+                    )
+                print(
+                    '\nself.listValuesDefinedField_2_Scatter[0] = %s' % 
+                    self.listValuesDefinedField_2_Scatter[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_2_Scatter[0]) = %s' %
+                    type(self.listValuesDefinedField_2_Scatter[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_2_Scatter) = %s' % 
+                    len(self.listValuesDefinedField_2_Scatter)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_2_Scatter = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields_Scatter,
@@ -60862,18 +60961,22 @@ class AccessMySQL(Frame):
         return
         
         
-    def handlerValueField_3_Scatter(self,user_field_3):
+    def handlerValueField_3_Scatter(self,numbered_user_field_3):
         '''
         Purpose:
-            create list of values using user_field_3;
+            create list of values using numbered_user_field_3;
             list single value in value field
         '''
         if DEBUG_PRINT_METHOD:
             print('\n** In ' + MODULE + '/' + 'handlerValueField_3_Scatter')
             
+# get rid of number in front of 'numbered_user_field_1'
+        user_field_3 = numbered_user_field_3.split('.')[1].strip()
+            
 # de-select checkboxes
         self.varSV_3_Scatter.set(0)
         self.varMV_3_Scatter.set(0)
+        
 # get index number from self.dictColumnHeaders
         localDict = {}
         flagFindField = False
@@ -60881,16 +60984,15 @@ class AccessMySQL(Frame):
             if key == user_field_3:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
+                
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_3 = %s was not found in the table\n' +
-                '  indicating a coding error or possibly an\n' +
-                '  erroneous index.\n\n' +
-                'Please report this problem.') % user_field_3
-                )
+                'user_field_3 = %s was not found in the table,\n' +
+                '  probably indicating an improper selection.\n\n'
+                ) % user_field_3
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -60902,15 +61004,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_3_Scatter = list(localDict)
-            self.listValuesDefinedField_3_Scatter.sort()
-            print(
-                'self.listValuesDefinedField_3_Scatter = \n %s' %
-                self.listValuesDefinedField_3_Scatter
-                )
-            print(
-                'self.listValuesDefinedField_3_Scatter[0] = %s \n\n' % 
-                self.listValuesDefinedField_3_Scatter[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_3_Scatter)):
+                    tempList.append(eval(self.listValuesDefinedField_3_Scatter[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_3_Scatter = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_3_Scatter.append(str(tempList[index]))
+            except:
+# sort text
+                self.listValuesDefinedField_3_Scatter.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                print(
+                    '\nself.listValuesDefinedField_3_Scatter = \n %s' %
+                    self.listValuesDefinedField_3_Scatter
+                    )
+                print(
+                    '\nself.listValuesDefinedField_3_Scatter[0] = %s' % 
+                    self.listValuesDefinedField_3_Scatter[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_3_Scatter[0]) = %s' %
+                    type(self.listValuesDefinedField_3_Scatter[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_3_Scatter) = %s' % 
+                    len(self.listValuesDefinedField_3_Scatter)
+                    )
+
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_3_Scatter = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields_Scatter,
@@ -60969,18 +61100,22 @@ class AccessMySQL(Frame):
         return
         
         
-    def handlerValueField_4_Scatter(self,user_field_4):
+    def handlerValueField_4_Scatter(self,numbered_user_field_4):
         '''
         Purpose:
-            create list of values using user_field_4;
+            create list of values using numbered_user_field_4;
             list single value in value field
         '''
         if DEBUG_PRINT_METHOD:
             print('\n** In ' + MODULE + '/' + 'handlerValueField_4_Scatter')
             
+# get rid of number in front of 'numbered_user_field_1'
+        user_field_4 = numbered_user_field_4.split('.')[1].strip()
+            
 # de-select checkboxes
         self.varSV_4_Scatter.set(0)
         self.varMV_4_Scatter.set(0)
+        
 # get index number from self.dictColumnHeaders
         localDict = {}
         flagFindField = False
@@ -60988,16 +61123,14 @@ class AccessMySQL(Frame):
             if key == user_field_4:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_4 = %s was not found in the table\n' +
-                '  indicating a coding error or possibly an\n' +
-                '  erroneous index.\n\n' +
-                'Please report this problem.') % user_field_4
-                )
+                'user_field_4 = %s was not found in the table,\n' +
+                '  probably indicating an improper selection.\n\n'
+                ) % user_field_4
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -61009,15 +61142,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_4_Scatter = list(localDict)
-            self.listValuesDefinedField_4_Scatter.sort()
-            print(
-                'self.listValuesDefinedField_4_Scatter = \n %s' %
-                self.listValuesDefinedField_4_Scatter
-                )
-            print(
-                'self.listValuesDefinedField_4_Scatter[0] = %s \n\n' % 
-                self.listValuesDefinedField_4_Scatter[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_4_Scatter)):
+                    tempList.append(eval(self.listValuesDefinedField_4_Scatter[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_4_Scatter = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_4_Scatter.append(str(tempList[index]))
+            except:
+# sort text   
+                self.listValuesDefinedField_4_Scatter.sort()
+                if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS_SCATTER:
+                print(
+                    '\nself.listValuesDefinedField_4_Scatter = \n %s' %
+                    self.listValuesDefinedField_4_Scatter
+                    )
+                print(
+                    '\nself.listValuesDefinedField_4_Scatter[0] = %s' % 
+                    self.listValuesDefinedField_4_Scatter[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_4_Scatter[0]) = %s' %
+                    type(self.listValuesDefinedField_4_Scatter[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_4_Scatter) = %s' % 
+                    len(self.listValuesDefinedField_4_Scatter)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_4_Scatter = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields,
@@ -61360,15 +61522,15 @@ class AccessMySQL(Frame):
             if key == user_field_1:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
+                
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_1 = %s was not found in the table,\n' +
+                'user_field_1 = %s was not found in the table,\n' +
                 '  probably indicating an improper selection.\n\n'
                 ) % user_field_1
-                )
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -61380,15 +61542,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_1 = list(localDict)
-            self.listValuesDefinedField_1.sort()
-            print(
-                'self.listValuesDefinedField_1 = \n %s' %
-                self.listValuesDefinedField_1
-                )
-            print(
-                'self.listValuesDefinedField_1[0] = %s \n\n' % 
-                self.listValuesDefinedField_1[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_1)):
+                    tempList.append(eval(self.listValuesDefinedField_1[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_1 = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_1.append(str(tempList[index]))
+            except:
+# sort text
+                self.listValuesDefinedField_1.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS:
+                print(
+                    '\nself.listValuesDefinedField_1 = \n %s' %
+                    self.listValuesDefinedField_1
+                    )
+                print(
+                    '\nself.listValuesDefinedField_1[0] = %s' % 
+                    self.listValuesDefinedField_1[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_1[0]) = %s' %
+                    type(self.listValuesDefinedField_1[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_1) = %s' % 
+                    len(self.listValuesDefinedField_1)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_1 = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields,
@@ -61406,14 +61597,8 @@ class AccessMySQL(Frame):
                 pady=5,
                 sticky=W,
                 )
-# set entry
-            if DEBUG_USER_DEFINED_FIELDS:
-                print('\nlen(self.listValuesDefinedField_1 = %s' % 
-                    len(self.listValuesDefinedField_1)
-                    )
-                print('value = %s' % self.listValuesDefinedField_1)
-            
-            
+                
+# set entry   
             if(
             len(self.listValuesDefinedField_1) <> 0
             and
@@ -61469,6 +61654,7 @@ class AccessMySQL(Frame):
 # de-select checkboxes
         self.varSV_2.set(0)
         self.varMV_2.set(0)
+        
 # get index number from self.dictColumnHeaders
         localDict = {}
         flagFindField = False
@@ -61476,16 +61662,14 @@ class AccessMySQL(Frame):
             if key == user_field_2:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_2 = %s was not found in the table\n' +
-                '  indicating a coding error or possibly an\n' +
-                '  erroneous index.\n\n' +
-                'Please report this problem.') % user_field_2
-                )
+                'user_field_2 = %s was not found in the table,\n' +
+                '  probably indicating an improper selection.\n\n'
+                ) % user_field_2
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -61497,15 +61681,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_2 = list(localDict)
-            self.listValuesDefinedField_2.sort()
-            print(
-                'self.listValuesDefinedField_2 = \n %s' %
-                self.listValuesDefinedField_2
-                )
-            print(
-                'self.listValuesDefinedField_2[0] = %s \n\n' % 
-                self.listValuesDefinedField_2[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_2)):
+                    tempList.append(eval(self.listValuesDefinedField_2[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_2 = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_2.append(str(tempList[index]))
+            except:
+# sort text
+                self.listValuesDefinedField_2.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS:
+                print(
+                    '\nself.listValuesDefinedField_2 = \n %s' %
+                    self.listValuesDefinedField_2
+                    )
+                print(
+                    '\nself.listValuesDefinedField_2[0] = %s' % 
+                    self.listValuesDefinedField_2[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_2[0]) = %s' %
+                    type(self.listValuesDefinedField_2[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_2) = %s' % 
+                    len(self.listValuesDefinedField_2)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_2 = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields,
@@ -61523,7 +61736,8 @@ class AccessMySQL(Frame):
                 pady=5,
                 sticky=W,
                 )
-# set entry
+                
+# set entry                
             if(
             len(self.listValuesDefinedField_2) <> 0
             and
@@ -61579,6 +61793,7 @@ class AccessMySQL(Frame):
 # de-select checkboxes
         self.varSV_3.set(0)
         self.varMV_3.set(0)
+        
 # get index number from self.dictColumnHeaders
         localDict = {}
         flagFindField = False
@@ -61586,16 +61801,14 @@ class AccessMySQL(Frame):
             if key == user_field_3:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_3 = %s was not found in the table\n' +
-                '  indicating a coding error or possibly an\n' +
-                '  erroneous index.\n\n' +
-                'Please report this problem.') % user_field_3
-                )
+                'user_field_3 = %s was not found in the table,\n' +
+                '  probably indicating an improper selection.\n\n'
+                ) % user_field_3
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -61607,15 +61820,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_3 = list(localDict)
-            self.listValuesDefinedField_3.sort()
-            print(
-                'self.listValuesDefinedField_3 = \n %s' %
-                self.listValuesDefinedField_3
-                )
-            print(
-                'self.listValuesDefinedField_3[0] = %s \n\n' % 
-                self.listValuesDefinedField_3[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_3)):
+                    tempList.append(eval(self.listValuesDefinedField_3[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_3 = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_3.append(str(tempList[index]))
+            except:
+# sort text
+                self.listValuesDefinedField_3.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as text values')
+                
+            if DEBUG_USER_DEFINED_FIELDS:
+                print(
+                    '\nself.listValuesDefinedField_3 = \n %s' %
+                    self.listValuesDefinedField_3
+                    )
+                print(
+                    '\nself.listValuesDefinedField_3[0] = %s' % 
+                    self.listValuesDefinedField_3[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_4[0]) = %s' %
+                    type(self.listValuesDefinedField_3[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_3) = %s' % 
+                    len(self.listValuesDefinedField_3)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_3 = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields,
@@ -61633,6 +61875,7 @@ class AccessMySQL(Frame):
                 pady=5,
                 sticky=W,
                 )
+                
 # set entry
             if(
             len(self.listValuesDefinedField_3) <> 0
@@ -61696,16 +61939,14 @@ class AccessMySQL(Frame):
             if key == user_field_4:
                 flagFindField = True
                 for row in range(len(self.tableValues)):
-                    localDict[self.tableValues[row][value-1]]=None
+                    localDict[str(self.tableValues[row][value-1])]=None
                 break
         if not flagFindField:
 # no field found
             stringErrorFindField = (
-                ('user_field_4 = %s was not found in the table\n' +
-                '  indicating a coding error or possibly an\n' +
-                '  erroneous index.\n\n' +
-                'Please report this problem.') % user_field_4
-                )
+                'user_field_4 = %s was not found in the table,\n' +
+                '  probably indicating an improper selection.\n\n'
+                ) % user_field_4
             print stringErrorFindField
             self.MySQL_Output(
                 0,
@@ -61717,15 +61958,44 @@ class AccessMySQL(Frame):
                 )
         else:
             self.listValuesDefinedField_4 = list(localDict)
-            self.listValuesDefinedField_4.sort()
-            print(
-                'self.listValuesDefinedField_4 = \n %s' %
-                self.listValuesDefinedField_4
-                )
-            print(
-                'self.listValuesDefinedField_4[0] = %s \n\n' % 
-                self.listValuesDefinedField_4[0]
-                )
+# if list is a list of numbers, change to numerical fields and then sort
+            tempList = []
+            try:
+# ... change to numerical values if possible
+                for index in range(len(self.listValuesDefinedField_4)):
+                    tempList.append(eval(self.listValuesDefinedField_4[index]))
+# ... sort as numbers; numbers as text (i.e., numbers in quotes) do not sort well
+                tempList.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as numerical values')
+# ... change back to strings
+                self.listValuesDefinedField_4 = []
+                for index in range(len(tempList)):
+                    self.listValuesDefinedField_4.append(str(tempList[index]))
+            except:
+# sort text
+                self.listValuesDefinedField_4.sort()
+                if DEBUG_USER_DEFINED_FIELDS:
+                    print('\nSORTED as text values')
+            
+            if DEBUG_USER_DEFINED_FIELDS:
+                print(
+                    '\nself.listValuesDefinedField_4 = \n %s' %
+                    self.listValuesDefinedField_4
+                    )
+                print(
+                    '\nself.listValuesDefinedField_4[0] = %s' % 
+                    self.listValuesDefinedField_4[0]
+                    )
+                print(
+                    '\ntype(self.listValuesDefinedField_4[0]) = %s' %
+                    type(self.listValuesDefinedField_4[0]) 
+                    )
+                print(
+                    '\nlen(self.listValuesDefinedField_4) = %s' % 
+                    len(self.listValuesDefinedField_4)
+                    )
+                    
 # re-plot combobox to update scrolledlist_items
             self.comboboxValueDefinedField_4 = Pmw.ComboBox(
                 self.frame_30_UserDefinedFields,
@@ -61743,6 +62013,7 @@ class AccessMySQL(Frame):
                 pady=5,
                 sticky=W,
                 )
+                
 # set entry
             if(
             len(self.listValuesDefinedField_4) <> 0
@@ -62994,7 +63265,7 @@ class AccessMySQL(Frame):
 # ... pickle buffer to file
         buttonTableValuesSavePickle_Buffer = Button(
             frame_20_20,
-            text='Pickle\nselect rows to file',
+            text='Pickle (save)\nselect rows to file',
             width=widthTableValueButtons,
             borderwidth=5,
             relief=RAISED,
@@ -63014,7 +63285,7 @@ class AccessMySQL(Frame):
 # ... unpickle file to buffer
         buttonTableValuesReadPickle_Buffer = Button(
             frame_20_20,
-            text='unPickle\nfile to buffer',
+            text='unPickle (restore)\nfile to buffer',
             width=widthTableValueButtons,
             borderwidth=5,
             relief=RAISED,
