@@ -195,7 +195,7 @@ DEBUG_MAXLINESTODISPLAY = 0     # = 1 print variables related to max lines to di
 DEBUG_PLOT_XY = 0                       # = 1 print variables related to X-Y Plot specs
 DEBUG_PLOT_SCATTER = 0              # = 1 print variables related to Scatter Plot specs
 DEBUG_PRINTFIRSTFEWROWS = 0      # = 1 print first few rows of table to command window
-DEBUG_PRINT_METHOD = 1                 # = 1 print which method PylotDB calls
+DEBUG_PRINT_METHOD = 0                 # = 1 print which method PylotDB calls
 DEBUG_PRINT_MISC = 0                    # = 1 print miscellaneous output
 DEBUG_PRINT_MYSQLCOMMANDFORINSERT = 0   # = 1 print variables for inserting mysql command from co-PylotDB
 DEBUG_PRINT_PREVIEW_KIVIAT = 0          # = 1 print variables related to previewing kiviat diagram labels
@@ -205,14 +205,14 @@ DEBUG_QUIKSELECT = 0                # = 1 print variables related to Quik Select
 DEBUG_REFRESHFIELDS = 0         # = 1 print MySQL Fields for selected Database and Table
 DEBUG_REFRESHREFERENCECURVELIST_SCATTER = 0 # = 1 print variable related to reference curve list for scatter plots
 DEBUG_REPLACE = 0                       # = 1 print variables from replacing a row in a table
-DEBUG_REPLACECHAR = 1              # = 1 print new string with substituted special characters for YAML fill & extraction
+DEBUG_REPLACECHAR = 0              # = 1 print new string with substituted special characters for YAML fill & extraction
 DEBUG_RESEQUENCE_AUTO_INDEX = 0         # = 1 print variables from resequencing auto_index primary key field
 DEBUG_RESTORE = 0                       # = 1 print variables related to database/table restore
 DEBUG_RESTORE_CHECKED_FIELD_NAMES = 0 # =1 print variables related to restoring fields to checked status
 DEBUG_ROWSELECT_TABLE = 0                 # = 1 print variables related to row selection for table
 DEBUG_ROWSELECT_BUFFER = 0      # = 1 print variables related to row selection for buffer
 DEBUG_SANDBOX = 0                       # = 1 print variables related to 'sandbox' table creation
-DEBUG_SAVE_CHECKED_FIELD_NAMES = 1 # = 1 print variables related to saving checked field names for re-displaying table
+DEBUG_SAVE_CHECKED_FIELD_NAMES = 0 # = 1 print variables related to saving checked field names for re-displaying table
 DEBUG_SCATTER = 0                       # = 1 print variables related to scatter plots
 DEBUG_SCATTER_LEGEND = 0            # = 1 print variables related to legend for scatter plots
 DEBUG_SELECTFIELD = 0                   # = 1 print variables related to select and display ordered fields
@@ -229,7 +229,7 @@ DEBUG_TEXT_REGEX = 0                    # = 1 detailed printout of regex (regula
 DEBUG_USER_DEFINED_FIELDS = 0           # = 1 print some variables for user-defined fields for storage buffer for XY plots
 DEBUG_USER_DEFINED_FIELDS_SCATTER = 0           # = 1 print some variables for user-defined fields for storage buffer from scatter plots
 DEBUG_VARXYSELECT = 0                   # = 1 prints variables related to re-defining self.varXSelect and self.varYSelect when reading in new table
-DEBUG_XY = 0                                # = 1 print variables related to X-Y plots
+DEBUG_XY = 0                                # = yam print variables related to X-Y plots
 DEBUG_XY_LABELS = 0                     # = 1 print variables related to labels for X-Y plots
 DEBUG_YAML = 0                          # = 1 detailed printout of yaml extraction process; = 0 suppress detailed output
 
@@ -36338,7 +36338,7 @@ class AccessMySQL(Frame):
         
         elif active == 1:
 # active = 1: make widget black on white to look active
-            print('     - blacking/whiting out widgets')
+#            print('     - blacking/whiting out widgets')
             color_bg = 'white'
             color_fg = 'black'
             
@@ -37700,9 +37700,15 @@ class AccessMySQL(Frame):
             pady=0,
             )
         '''
+        
+        tempListOfAllFields = []
+        for number,field in enumerate(self.myDatabaseFields):
+            tempListOfAllFields.append(str(number + 1) + '. ' + field)
+            
         self.comboboxY1LabelSingleCurvePerPlotTable = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -37717,7 +37723,8 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
-        self.comboboxY1LabelSingleCurvePerPlotTable.setentry('')
+        self.comboboxY1LabelSingleCurvePerPlotTable.setentry('')        
+        
         label = Label(
             frame_40_Table,
             text=' + ',
@@ -37730,9 +37737,11 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxY2LabelSingleCurvePerPlotTable = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -37748,6 +37757,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxY2LabelSingleCurvePerPlotTable.setentry('')
+        
         label = Label(
             frame_40_Table,
             text=' + ',
@@ -37760,9 +37770,11 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxY3LabelSingleCurvePerPlotTable = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -37792,6 +37804,7 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=E,
             )
+            
         self.entryfieldYUserLabelSingleCurvePerPlotTable = Pmw.EntryField(
             frame_40_Table,
             entry_width=30,
@@ -37864,6 +37877,7 @@ class AccessMySQL(Frame):
             pady=2,
             ) 
         self.entryfieldYLabelShowTable.setvalue('')
+        
         buttonShowXYLabelsTable = Button(
             frame_60_Table,
             text='Preview first labels',
@@ -37881,6 +37895,7 @@ class AccessMySQL(Frame):
             padx=5,
             pady=2,
             )
+            
 # ... reset all
         self.buttonResetAllSingleCurvePerPlotTable = Button(
             frame_70_Table,
@@ -38275,6 +38290,7 @@ class AccessMySQL(Frame):
     def handlerShowXYLabelsTable(self):
         '''
         Purpose:
+            - For single curve per plot, all plots in one window
             take user input from designated widgets and display
             X and Y Labels for plots in respective display fields,
             and display error msg if no data to choose from
@@ -38316,7 +38332,8 @@ class AccessMySQL(Frame):
         yHeaders.extend(self.headerNames_Y_Table)
         
         if DEBUG_XY_LABELS:
-            print ' yHeaders =\n',yHeaders        
+            print(' yHeaders =\n')
+            print(yHeaders)        
 
 # determine plot label separator
         separator = self.determinePlotLabelSeparator(
@@ -38369,8 +38386,8 @@ class AccessMySQL(Frame):
             yLabelString = ''
             if self.varCheckbuttonYHeaderLabelSingleCurvePerPlotTable.get():
                 yLabelString = header
-            if self.comboboxY1LabelSingleCurvePerPlotTable.get().strip() <> '':
-                field1 = self.comboboxY1LabelSingleCurvePerPlotTable.get()
+            if self.comboboxY1LabelSingleCurvePerPlotTable.get().strip() <> '':                    
+                field1 = self.comboboxY1LabelSingleCurvePerPlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -38379,9 +38396,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if yLabelString <> '':
-                                yLabelString += separator + self.tableValues[0][value-1]
+                                yLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                yLabelString = self.tableValues[0][value-1]
+                                yLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -38409,7 +38426,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxY2LabelSingleCurvePerPlotTable.get().strip() <> '':
-                field2 = self.comboboxY2LabelSingleCurvePerPlotTable.get()
+                field2 = self.comboboxY2LabelSingleCurvePerPlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -38418,9 +38435,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if yLabelString <> '':
-                                yLabelString += separator + self.tableValues[0][value-1]
+                                yLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                yLabelString = self.tableValues[0][value-1]
+                                yLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -38448,7 +38465,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxY3LabelSingleCurvePerPlotTable.get().strip() <> '':
-                field3 = self.comboboxY3LabelSingleCurvePerPlotTable.get()
+                field3 = self.comboboxY3LabelSingleCurvePerPlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -38457,9 +38474,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if yLabelString <> '':
-                                yLabelString += separator + self.tableValues[0][value-1]
+                                yLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                yLabelString = self.tableValues[0][value-1]
+                                yLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -39578,10 +39595,15 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable.set(1)
+        
+        tempListOfAllFields = []
+        for number,field in enumerate(self.myDatabaseFields):
+            tempListOfAllFields.append(str(number + 1) + '. ' + field)
             
         self.comboboxLegend1LabelAllCurvesOnOnePlotTable = Pmw.ComboBox(
             frame_10_Table,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -39597,6 +39619,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend1LabelAllCurvesOnOnePlotTable.setentry('')
+        
         label = Label(
             frame_10_Table,
             text=' + ',
@@ -39609,9 +39632,11 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegend2LabelAllCurvesOnOnePlotTable = Pmw.ComboBox(
             frame_10_Table,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -39627,6 +39652,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend2LabelAllCurvesOnOnePlotTable.setentry('')
+        
         label = Label(
             frame_10_Table,
             text=' + ',
@@ -39639,9 +39665,11 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegend3LabelAllCurvesOnOnePlotTable = Pmw.ComboBox(
             frame_10_Table,
-            scrolledlist_items=listOfTextFields,
+#            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -39657,6 +39685,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend3LabelAllCurvesOnOnePlotTable.setentry('')
+        
         label = Label(
             frame_10_Table,
             text=' + ',
@@ -39670,6 +39699,7 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=E,
             )
+            
         self.entryfieldLegendUserLabelAllCurvesOnOnePlotTable = Pmw.EntryField(
             frame_10_Table,
             entry_width=30,
@@ -39684,6 +39714,7 @@ class AccessMySQL(Frame):
             sticky=W,
             )
         self.entryfieldLegendUserLabelAllCurvesOnOnePlotTable.setvalue('')
+        
 # ... show labels
 # ...       show labels widgets
         label = Label(
@@ -39714,6 +39745,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.entryfieldLegendLabelShowTable.setvalue('')
+        
         buttonShowLegendLabelsTable = Button(
             frame_20_Table,
             text='Preview first legend label',
@@ -39730,6 +39762,7 @@ class AccessMySQL(Frame):
             padx=5,
             pady=2,
             )
+            
 # ... reset all
         self.buttonResetAllLegendLabelsTable = Button(
             frame_30_Table,
@@ -39834,6 +39867,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.setentry('')
+        
         label = Label(
             frame_10_Buffer,
             text=' + ',
@@ -39846,6 +39880,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer = Pmw.ComboBox(
             frame_10_Buffer,
             scrolledlist_items=self.labelNamesBufferStorage,
@@ -39864,6 +39899,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.setentry('')
+        
         label = Label(
             frame_10_Buffer,
             text=' + ',
@@ -39876,6 +39912,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer = Pmw.ComboBox(
             frame_10_Buffer,
             scrolledlist_items=self.labelNamesBufferStorage,
@@ -39894,6 +39931,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.setentry('')
+        
         label = Label(
             frame_10_Buffer,
             text=' + ',
@@ -39907,6 +39945,7 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=E
             )
+            
         self.entryfieldLegendUserLabelAllCurvesOnOnePlotBuffer = Pmw.EntryField(
             frame_10_Buffer,
             entry_width=30,
@@ -39921,6 +39960,7 @@ class AccessMySQL(Frame):
             sticky=W,
             )
         self.entryfieldLegendUserLabelAllCurvesOnOnePlotBuffer.setvalue('')
+        
 # ... show labels
 # ...       show labels widgets
         label = Label(
@@ -39935,6 +39975,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.entryfieldLegendLabelShowBuffer = Pmw.EntryField(
             frame_20_Buffer,
             entry_width=35,
@@ -39951,6 +39992,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.entryfieldLegendLabelShowBuffer.setvalue('')
+        
         buttonShowLegendLabelsBuffer = Button(
             frame_20_Buffer,
             text='Preview first legend label',
@@ -39967,6 +40009,7 @@ class AccessMySQL(Frame):
             padx=5,
             pady=2,
             )
+            
 # ... reset all
         self.buttonResetAllLegendLabelsBuffer = Button(
             frame_30_Buffer,
@@ -40311,10 +40354,14 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable_Scatter.set(1)
+        
+        tempListOfAllFields = []
+        for number,field in enumerate(self.myDatabaseFields):
+            tempListOfAllFields.append(str(number + 1) + '. ' + field)       
             
         self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter = Pmw.ComboBox(
             frame_10_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -40346,7 +40393,7 @@ class AccessMySQL(Frame):
             
         self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter = Pmw.ComboBox(
             frame_10_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -40362,6 +40409,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.setentry('')
+        
         label = Label(
             frame_10_Table,
             text=' + ',
@@ -40374,9 +40422,10 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter = Pmw.ComboBox(
             frame_10_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -40392,6 +40441,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.setentry('')
+        
         label = Label(
             frame_10_Table,
             text=' + ',
@@ -40405,6 +40455,7 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=E,
             )
+            
         self.entryfieldLegendUserLabelAllCurvesOnOnePlotTable_Scatter = Pmw.EntryField(
             frame_10_Table,
             entry_width=30,
@@ -40419,6 +40470,7 @@ class AccessMySQL(Frame):
             sticky=W,
             )
         self.entryfieldLegendUserLabelAllCurvesOnOnePlotTable_Scatter.setvalue('')
+        
 # ... show labels
 # ...       show labels widgets
         label = Label(
@@ -40433,6 +40485,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.entryfieldLegendLabelShowTable_Scatter = Pmw.EntryField(
             frame_20_Table,
             entry_width=35,
@@ -40449,6 +40502,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.entryfieldLegendLabelShowTable_Scatter.setvalue('')
+        
         buttonShowLegendLabelsTable_Scatter = Button(
             frame_20_Table,
             text='Preview first legend label',
@@ -40569,6 +40623,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.setentry('')
+        
         label = Label(
             frame_10_Buffer,
             text=' + ',
@@ -40581,6 +40636,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter = Pmw.ComboBox(
             frame_10_Buffer,
             scrolledlist_items=self.labelNamesBufferStorage,
@@ -40738,6 +40794,7 @@ class AccessMySQL(Frame):
     def handlerShowLegendLabelsTable(self):
         '''
         Purpose:
+            - For all curves on one plot in one window
             Preview first legend label from Table in 'Legend Labels' window
             with error msg.
             Only Y-headers needed to form legend labels; X-Headers are not needed.
@@ -40793,6 +40850,13 @@ class AccessMySQL(Frame):
         separator = self.determinePlotLabelSeparator(
             self.comboboxLegendLabelSeparatorAll.get()
             )
+            
+        if DEBUG_XY_LABELS:
+            print('-'*80)
+            print('\n\n*** In ' + MODULE + '/' + 'handlerShowLegendLabelsTable ***')
+            print('self.headerNames_X_Table =\n%s' % self.headerNames_X_Table)
+            print('self.headerNames_Y_Table =\n%s' % self.headerNames_Y_Table)
+            print '-'*80
         
 # concatenate Y-label strings
         self.legendLabelStringTable = []
@@ -40801,7 +40865,7 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -40810,9 +40874,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -40840,7 +40904,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()                
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -40849,9 +40913,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -40879,7 +40943,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -40888,9 +40952,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -40986,7 +41050,7 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable_Scatter.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -40995,9 +41059,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41025,7 +41089,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -41034,9 +41098,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41064,7 +41128,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41073,9 +41137,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41159,7 +41223,7 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -41168,9 +41232,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41198,7 +41262,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -41207,9 +41271,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41237,7 +41301,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41246,9 +41310,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41327,7 +41391,7 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable_Scatter.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -41336,9 +41400,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41367,7 +41431,7 @@ class AccessMySQL(Frame):
                             return
                             
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -41376,9 +41440,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41407,7 +41471,7 @@ class AccessMySQL(Frame):
                             return
                             
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41416,9 +41480,9 @@ class AccessMySQL(Frame):
                         self.tableValues[0][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[0][value-1]
+                                legendLabelString += separator + str(self.tableValues[0][value-1])
                             else:
-                                legendLabelString = self.tableValues[0][value-1]
+                                legendLabelString = str(self.tableValues[0][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -41546,7 +41610,7 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -41555,9 +41619,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41585,7 +41649,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -41594,9 +41658,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41624,7 +41688,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -41633,9 +41697,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41730,7 +41794,7 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -41739,9 +41803,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41769,7 +41833,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -41778,9 +41842,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41808,7 +41872,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -41817,9 +41881,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41891,7 +41955,7 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -41900,9 +41964,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41930,7 +41994,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -41939,9 +42003,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -41969,7 +42033,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -41978,9 +42042,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -42055,7 +42119,7 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -42064,9 +42128,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -42094,7 +42158,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -42103,9 +42167,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -42133,7 +42197,7 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -42142,9 +42206,9 @@ class AccessMySQL(Frame):
                         self.bufferRowStore[index][value] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.bufferRowStore[index][value]
+                                legendLabelString += separator + str(self.bufferRowStore[index][value])
                             else:
-                                legendLabelString = self.bufferRowStore[index][value]
+                                legendLabelString = str(self.bufferRowStore[index][value])
                             break
                         else:
                             stringNoValue = (
@@ -53410,8 +53474,6 @@ class AccessMySQL(Frame):
         self.indexEditSelectedRows_Start = 0
         
 # display headers, row numbers, row checkboxes, table values
-# DWB: 
-        print('\n>>> CALLING displayHeadersRowsValues')
         self.displayHeadersRowsValues(
             tableValues, tableStructure, 0, maxLinesDisplay, True
             )
@@ -55822,17 +55884,13 @@ class AccessMySQL(Frame):
                 existsLabelsSingle = self.toplevelLabelsSinglePlotPerCurve.winfo_exists()
             except:
                 existsLabelsSingle = 0
-                
-            print '\n*** existsLabelsSingle =',existsLabelsSingle
             
             if not existsLabelsSingle:
-                print '    calling self.labels_SingleCurvePerPlot'
                 self.labels_SingleCurvePerPlot(
                     self.labels_xWindowLocationSingle,
                     self.labels_yWindowLocationSingle
                     )
             else:
-                print '    lift Single above All window'
                 try:
                     self.toplevelLabelsSinglePlotPerCurve.deiconify()
                 except:
@@ -55845,7 +55903,7 @@ class AccessMySQL(Frame):
                 existsLabelsAll = self.toplevelLegendLabelsAllCurvesOnePlot.winfo_exists()
             except:
                 existsLabelsAll = False
-            print 'existsLabelsAll =',existsLabelsAll
+                
             if existsLabelsAll:
                 try:
 #                    self.toplevelLegendLabelsAllCurvesOnePlot.iconify()
@@ -56060,7 +56118,7 @@ class AccessMySQL(Frame):
                 existsLabelsSingle = self.toplevelLabelsSinglePlotPerCurve.winfo_exists()
             except:
                 existsLabelsSingle = False
-            print 'existsLabelsSingle =',existsLabelsSingle
+
             if existsLabelsSingle:
                 try:
 #                    self.toplevelLabelsSinglePlotPerCurve.iconify()
@@ -69707,7 +69765,8 @@ class AccessMySQL(Frame):
                 'This will destroy the old window and initialize a new\n' +
                 'window with no Table or Buffer curves specified.\n\n' +
                 'Otherwise, click Cancel to continue with the "X-Y Plot\n' +
-                'Specs" window as is.'
+                'Specs" window as is.',
+                parent=self.toplevelXYPlotPreprocess
                 )
             if not ans:
                 return
@@ -69841,7 +69900,7 @@ class AccessMySQL(Frame):
         except:
             pass    # self.varYSelect not yet defined
 
-        print '\nself.index_Y = ',self.index_Y
+#        print '\nself.index_Y = ',self.index_Y
         self.MySQL_Output(
             1,
             ('self.index_Y for plotting:\n%s' % self.index_Y)
@@ -70030,7 +70089,11 @@ class AccessMySQL(Frame):
             
 # see which column checkboxes have been checked
             varX = self.varXSelect.get()
-            print ' varX = %s \n' % varX
+#            print ' varX = %s \n' % varX
+            self.MySQL_Output(
+            1,
+            ('varX for plotting:\n%s' % varX)
+            )     
             
 # find corresponding column number and title            
             for key,columnNumber in self.dictColumnHeaders.iteritems():
@@ -70336,7 +70399,8 @@ class AccessMySQL(Frame):
                 'This will destroy the old window and initialize a new\n' +
                 'window with no Table or Buffer curves specified.\n\n' +
                 'Otherwise, click Cancel to continue with the "Scatter Plot Specs"\n' +
-                'window as is.'
+                'window as is.',
+                parent=self.toplevelScatterPlotPreprocess
                 )
             if not ans:
                 return
@@ -74617,21 +74681,24 @@ class AccessMySQL(Frame):
                                     )
                             return
                              
-                        print('\nDWB: columnHeading = %s' % columnHeading)
+                        if DEBUG_YAML:
+                            print('\ncolumnHeading = %s' % columnHeading)
                                 
 # find same column heading in table on server
                         stringTableStructure = (
                             'SHOW COLUMNS FROM ' + self.myDatabase + '.' + self.myTable
                             )
                             
-                        print('\nDWB: command to show columns:\n' )
-                        print(stringTableStructure)
+                        if DEBUG_YAML:
+                            print('\ncommand to show columns:\n' )
+                            print(stringTableStructure)
                         
                         self.cursorHandleMySQL.execute(stringTableStructure)
                         structureTable = self.cursorHandleMySQL.fetchall()
                         
-                        print('\nDWB: structureTable = ')
-                        print(structureTable)
+                        if DEBUG_YAML:
+                            print('\nstructureTable = ')
+                            print(structureTable)
                         
                         columnNumber_Count = 0
                         columnNumber_All = -1
@@ -74669,23 +74736,22 @@ class AccessMySQL(Frame):
                         stringSelectRow = 'select * from ' + self.myDatabase + '.' + self.myTable + \
                             ' where auto_index=' + str(autoIndexValue)
 
-                        print('\nDWB: stringSelectRow:\n')
-                        print(stringSelectRow)
+                        if DEBUG_YAML:
+                            print('\nstringSelectRow:\n')
+                            print(stringSelectRow)
                         
                         self.cursorHandleMySQL.execute(stringSelectRow)
                         returnObject = self.cursorHandleMySQL.fetchall()
-                        print('\nDWB: returnObject:\n')
-                        print(returnObject)
+                        if DEBUG_YAML:
+                            print('\nreturnObject:\n')
+                            print(returnObject)
 #                        yamlObject = returnObject[0].[columnNumber_All]
                         yamlObject = list(returnObject[0])[columnNumber_All + 1]
-                        print('\nDWB: yamlObject:\n')
-                        print('>> printing yaml object')
-                        print(yamlObject)
-                        print('\n>> now exiting')
-                        
-                        print('\nDWB: autoIndexValue = %s' % autoIndexValue)
-
-                        print('')
+                        if DEBUG_YAML:
+                            print('\nyamlObject:\n')
+                            print(yamlObject)
+                            print('\nautoIndexValue = %s' % autoIndexValue)
+                            print('')
                         
 # allow for empty entry in selected column; if so, continue looping thru rows
                     if yamlObject == '':
@@ -75238,7 +75304,8 @@ class AccessMySQL(Frame):
                             if not ans:
                                 return
                         else:
-                            print(' SUCCESS: field has been added')
+                            if DEBUG_YAML:
+                                print(' SUCCESS: field has been added')
                             totalHeadersAdded += 1
 
 # UPDATE TABLE VALUES USING 'INSERT' STATEMENT  
@@ -75345,7 +75412,8 @@ class AccessMySQL(Frame):
                                 return
 #                    else:
 #                        print('UPDATE success!')
-                print(' UPDATE success!')
+                if DEBUG_YAML:
+                    print(' UPDATE success!')
        
 # --- END of "for row in row_numbers_Affected:"
 
@@ -76456,7 +76524,8 @@ class AccessMySQL(Frame):
                 'This will destroy the old window and initialize a new\n' +
                 'window with no Table or Buffer curves specified.\n\n' +
                 'Otherwise, click Cancel to continue with the "Kiviat Plotting\n' +
-                'Specs" window as is.'
+                'Specs" window as is.',
+                parent=self.toplevelKiviatPlotPreprocess
                 )
             if not ans:
                 return
@@ -81316,9 +81385,14 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
+        tempListOfAllFields = []
+        for number,field in enumerate(self.myDatabaseFields):
+            tempListOfAllFields.append(str(number + 1) + '. ' + field)           
+            
         self.comboboxLegendLabelTable_1_AllGroupsPerWindow_Kiviat = Pmw.ComboBox(
             frame_55_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -81334,6 +81408,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegendLabelTable_1_AllGroupsPerWindow_Kiviat.setentry('')
+        
         label = Label(
             frame_55_Table,
             text=' + ',
@@ -81346,9 +81421,10 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegendLabelTable_2_AllGroupsPerWindow_Kiviat = Pmw.ComboBox(
             frame_55_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -81364,6 +81440,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegendLabelTable_2_AllGroupsPerWindow_Kiviat.setentry('')
+        
         label = Label(
             frame_55_Table,
             text=' + ',
@@ -81376,9 +81453,10 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxLegendLabelTable_3_AllGroupsPerWindow_Kiviat = Pmw.ComboBox(
             frame_55_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -81394,6 +81472,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxLegendLabelTable_3_AllGroupsPerWindow_Kiviat.setentry('')
+        
         label = Label(
             frame_55_Table,
             text=' + ',
@@ -81406,6 +81485,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.entryfieldLegendLabelTable_User_AllGroupsPerWindow_Kiviat = Pmw.EntryField(
             frame_55_Table,
             entry_width=30,
@@ -82322,9 +82402,14 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
+        tempListOfAllFields = []
+        for number,field in enumerate(self.myDatabaseFields):
+            tempListOfAllFields.append(str(number + 1) + '. ' + field)
+            
         self.comboboxY1LabelSingleGroupPerPlotTable_OneGroupPerWindow_Kiviat = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -82354,7 +82439,7 @@ class AccessMySQL(Frame):
             )
         self.comboboxY2LabelSingleGroupPerPlotTable_OneGroupPerWindow_Kiviat = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -82384,7 +82469,7 @@ class AccessMySQL(Frame):
             )
         self.comboboxY3LabelSingleGroupPerPlotTable_OneGroupPerWindow_Kiviat = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -83272,9 +83357,14 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
+        tempListOfAllFields = []
+        for number,field in enumerate(self.myDatabaseFields):
+            tempListOfAllFields.append(str(number + 1) + '. ' + field)
+            
         self.comboboxY1LabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -83290,6 +83380,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxY1LabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat.setentry('')
+        
         label = Label(
             frame_40_Table,
             text=' + ',
@@ -83302,9 +83393,10 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxY2LabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -83320,6 +83412,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxY2LabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat.setentry('')
+        
         label = Label(
             frame_40_Table,
             text=' + ',
@@ -83332,9 +83425,10 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.comboboxY3LabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat = Pmw.ComboBox(
             frame_40_Table,
-            scrolledlist_items=listOfTextFields,
+            scrolledlist_items=tempListOfAllFields,
             listheight=150,
             entry_width=15,
             dropdown=1,
@@ -83350,6 +83444,7 @@ class AccessMySQL(Frame):
             pady=0,
             )
         self.comboboxY3LabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat.setentry('')
+        
         label = Label(
             frame_40_Table,
             text=' + ',
@@ -83362,6 +83457,7 @@ class AccessMySQL(Frame):
             padx=0,
             pady=0,
             )
+            
         self.entryfieldYUserLabelSingleGroupPerPlotTable_OneCurvePerPlot_Kiviat = Pmw.EntryField(
             frame_40_Table,
             entry_width=30,
@@ -84322,9 +84418,7 @@ class AccessMySQL(Frame):
             )
 
 # concatenate legend label strings
-        self.legendLabelStringTable_Kiviat = (
-            self.assembleLegendLabelStringTable_Kiviat(legendLabels)
-            )
+        self.legendLabelStringTable_Kiviat = self.assembleLegendLabelStringTable_Kiviat(legendLabels)
 
 # show strings in respective fields
 #	self.entryfieldSpokeLabelTable_Preview_AllGroupsPerWindow_Kiviat
@@ -85100,7 +85194,7 @@ class AccessMySQL(Frame):
         return
         
     
-    def assembleLegendLabelStringTable_Kiviat(self,legendLabels):
+    def assembleLegendLabelStringTable_Kiviat(self, legendLabels):
         '''
         Purpose:
             assemble legend label strings for Kiviat plots
@@ -85143,7 +85237,10 @@ class AccessMySQL(Frame):
                 legendLabelString += label
                 
             field1=''
-            field1 = self.comboboxLegendLabelTable_1_AllGroupsPerWindow_Kiviat.get()
+            try:
+                field1 = self.comboboxLegendLabelTable_1_AllGroupsPerWindow_Kiviat.get().split('.')[1].strip()
+            except:
+                pass
             if field1:
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:                    
@@ -85153,9 +85250,9 @@ class AccessMySQL(Frame):
                         self.tableValues[row][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[row][value-1]
+                                legendLabelString += separator + str(self.tableValues[row][value-1])
                             else:
-                                legendLabelString = self.tableValues[row][value-1]
+                                legendLabelString = str(self.tableValues[row][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -85184,7 +85281,10 @@ class AccessMySQL(Frame):
                             return
                             
             field2=''
-            field2 = self.comboboxLegendLabelTable_2_AllGroupsPerWindow_Kiviat.get()
+            try:
+                field2 = self.comboboxLegendLabelTable_2_AllGroupsPerWindow_Kiviat.get().split('.')[1].strip()
+            except:
+                pass
             if field2:
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
@@ -85194,9 +85294,9 @@ class AccessMySQL(Frame):
                         self.tableValues[row][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[row][value-1]
+                                legendLabelString += separator + str(self.tableValues[row][value-1])
                             else:
-                                legendLabelString = self.tableValues[row][value-1]
+                                legendLabelString = str(self.tableValues[row][value-1])
                             break
                         else:
                             stringNoValue = (
@@ -85225,7 +85325,10 @@ class AccessMySQL(Frame):
                             return
 
             field3=''
-            field3 = self.comboboxLegendLabelTable_3_AllGroupsPerWindow_Kiviat.get()
+            try:
+                field3 = self.comboboxLegendLabelTable_3_AllGroupsPerWindow_Kiviat.get().split('.')[1].strip()
+            except:
+                pass
             if field3:
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
@@ -85235,9 +85338,9 @@ class AccessMySQL(Frame):
                         self.tableValues[row][value-1] <> ''
                         ):
                             if legendLabelString <> '':
-                                legendLabelString += separator + self.tableValues[row][value-1]
+                                legendLabelString += separator + str(self.tableValues[row][value-1])
                             else:
-                                legendLabelString = self.tableValues[row][value-1]
+                                legendLabelString = str(self.tableValues[row][value-1])
                             break
                         else:
                             stringNoValue = (
