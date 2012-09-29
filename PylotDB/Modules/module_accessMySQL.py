@@ -40865,7 +40865,8 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -40904,7 +40905,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()                
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()                
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip()                
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -40943,7 +40945,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41050,7 +41053,8 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable_Scatter.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -41089,7 +41093,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -41128,7 +41133,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41223,7 +41229,8 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -41262,7 +41269,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -41301,7 +41309,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41391,7 +41400,8 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable_Scatter.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -41431,7 +41441,8 @@ class AccessMySQL(Frame):
                             return
                             
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -41471,7 +41482,8 @@ class AccessMySQL(Frame):
                             return
                             
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable_Scatter.get().strip()
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41610,7 +41622,8 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -41649,7 +41662,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -41688,7 +41702,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -41794,7 +41809,8 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -41833,7 +41849,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -41872,7 +41889,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -41955,7 +41973,8 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -41994,7 +42013,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -42033,7 +42053,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -42119,7 +42140,8 @@ class AccessMySQL(Frame):
 #                self.legendLabelStringBuffer.append(self.bufferRowStore[index][6])                 
                 legendLabelString = self.bufferRowStore[index][6]                 
             if self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field1:
                         if(
@@ -42158,7 +42180,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field2:
                         if(
@@ -42197,7 +42220,8 @@ class AccessMySQL(Frame):
                                     )
                             return
             if self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip() <> '':
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().split('.')[1].strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotBuffer_Scatter.get().strip()
                 for key,value in self.dictNamesBufferStorage.iteritems():
                     if key == field3:
                         if(
@@ -65600,9 +65624,13 @@ class AccessMySQL(Frame):
         self.varUnPickleFileName.set('')      
         
 # refresh storage buffer
-# ... clear all checkboxes in buffer storage window
-        for var in self.varSelectAnyRow_Buffer:
-            var.set(0) 
+# ... clear all checkboxes in buffer storage window;
+# ... Note: there may be no rows if a file has just been unpickled
+        try:
+            for var in self.varSelectAnyRow_Buffer:
+                var.set(0)
+        except:
+            pass
       
 # ... set new number of rows
         self.bufferRowStore_NumRows = len(self.bufferRowStore)
@@ -71164,10 +71192,14 @@ class AccessMySQL(Frame):
 #  get which rows have been selected ; to be restored below after Storage Buffer is displayed again
         indexStore = []
         icount = 0
-        for var in self.varSelectAnyRow_Buffer:
-            if var.get(): 
-                indexStore.append(icount)
-            icount += 1
+# ... Note: there may be no rows if a file has just been unpickled
+        try:
+            for var in self.varSelectAnyRow_Buffer:
+                if var.get(): 
+                    indexStore.append(icount)
+                icount += 1
+        except:
+            pass
 
         if self.varHideShowSet.get() == 0:
             self.displayStorageBufferValues(0)
