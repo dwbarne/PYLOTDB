@@ -29,6 +29,7 @@ import subprocess               # for database/table backup and restore
 import pylab
 import copy                     # to make deep copies (copy.deepcopy()) of objects (i.e., separate copies, not references)
 import math                     # for tangent
+import socket			# to get hostname
 
 # import external modules
 stringErrorExternalModules = ''
@@ -87058,7 +87059,8 @@ class AccessMySQL(Frame):
 # if windows ...
         if os.name == 'nt':
             self.userName = os.environ['USERNAME']
-            self.computerName = os.environ['COMPUTERNAME']
+#            self.computerName = os.environ['COMPUTERNAME']
+            self.computerName = socket.gethostname()
             self.operatingSystem = os.environ['OS']
 #            self.processorArchitecture = os.environ['PROCESSOR_ARCHITECTURE']
 #            self.processorIdentifier = os.environ['PROCESSOR_IDENTIFIER']
@@ -87066,7 +87068,8 @@ class AccessMySQL(Frame):
 # if unix ...
         elif os.name == 'posix':
             self.userName = os.environ['USER']
-            self.computerName = os.environ['HOSTNAME']
+#            self.computerName = os.environ['HOSTNAME']
+            self.computerName = socket.gethostname()
             self.operatingSystem = '*nix'
 #            self.processorArchitecture = 'UNK'
 #            self.processorIdentifier = 'UNK'

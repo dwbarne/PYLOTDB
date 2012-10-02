@@ -83,9 +83,12 @@ versionPython = platform.python_version()
 
 # module search path
 if os.name == 'posix':
-# NOTE: for Mac users, use '/Users/' instead of '/home/' below; 
-# ... (I don't know how to tell the difference between Linux 'posix' and Mac 'posix')
-    pylotdbHOME = '/home/' + os.environ['USER'] + '/PylotDB'
+# NOTE: works for Mac where home directory starts with '/Users/', as well
+#      as *nix machines where home directory starts with '/home/'; 
+# ... get home dir
+    homeDir = os.path.expanduser('~') 	
+#    pylotdbHOME = '/home/' + os.environ['USER'] + '/PylotDB'
+    pylotdbHOME = os.path.expanduser('~') + '/PylotDB'
     sys.path.append(pylotdbHOME + '/Modules')
     if DEBUG_MODULE_PATH:
         print('...appended ' + pylotdbHOME +'/Modules to path')
@@ -1188,17 +1191,17 @@ class PylotDB(Frame):
                 self.userName = 'UNK'
                 
             try:
-                self.computerName = os.environ['HOSTNAME']
+                self.computerName = socket.gethostname() 
             except:
                 self.computerName = 'UNK'
                 
 #            self.operatingSystem = '*nix'
 
-                self.processorArchitecture = 'UNK'
+            self.processorArchitecture = 'UNK'
                 
-                self.processorIdentifier = 'UNK'
+            self.processorIdentifier = 'UNK'
                 
-                self.sessionName = 'UNK'
+            self.sessionName = 'UNK'
                 
 # if unknown ...
         else:
