@@ -3482,45 +3482,12 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=W,
             )
-# ... 'backup' directory
-        labelBackupDirectory = Label(
-            frame_20_10,
-            text=(
-                'Backup to local directory:'
-                ),
-            bg=colorbg,
-            justify=RIGHT,
-            font=self.labelFontMedium,
-            )
-        labelBackupDirectory.grid(
-            row=0,
-            column=0,
-            padx=0,
-            pady=1,
-            sticky=E,
-            )
-# ... 'backup' directory entry field
-        self.varBackupDirName = StringVar()
-        self.entryBackupDirName = Entry(
-            frame_20_10,
-            textvariable=self.varBackupDirName,
-            bg='white',
-            fg='black',
-            width=35,
-            font=self.labelFontMedium,
-            )
-        self.entryBackupDirName.grid(
-            row=0,
-            column=1,
-            padx=0,
-            pady=1,
-            sticky=W,
-            )
+            
 # ... 'backup' filename
         labelBackupFilename = Label(
             frame_20_10,
             text=(
-                'and use filename\n' +
+                'Use filename\n' +
                 '("date_time.sql" (mmddyy_HHMM.sql) will be appended):'
                 ),
             bg=colorbg,
@@ -3528,7 +3495,7 @@ class AccessMySQL(Frame):
             font=self.labelFontMedium,
             )
         labelBackupFilename.grid(
-            row=1,
+            row=0,
             column=0,
             padx=0,
             pady=2,
@@ -3545,13 +3512,49 @@ class AccessMySQL(Frame):
             font=self.labelFontMedium,
             )
         self.entryBackupFileName.grid(
-            row=1,
+            row=0,
             column=1,
             padx=0,
             pady=0,
             sticky=W,
             )
         
+            
+# ... 'backup' directory
+        labelBackupDirectory = Label(
+            frame_20_10,
+            text=(
+                'and backup to local directory:'
+                ),
+            bg=colorbg,
+            justify=RIGHT,
+            font=self.labelFontMedium,
+            )
+        labelBackupDirectory.grid(
+            row=1,
+            column=0,
+            padx=0,
+            pady=1,
+            sticky=E,
+            )
+# ... 'backup' directory entry field
+        self.varBackupDirName = StringVar()
+        self.entryBackupDirName = Entry(
+            frame_20_10,
+            textvariable=self.varBackupDirName,
+            bg='white',
+            fg='black',
+            width=35,
+            font=self.labelFontMedium,
+            )
+        self.entryBackupDirName.grid(
+            row=1,
+            column=1,
+            padx=0,
+            pady=1,
+            sticky=W,
+            )
+
 # .. 'backup' browse button
         buttonBrowseForBackupFile = Button(
             frame_20_10,
@@ -3685,52 +3688,19 @@ class AccessMySQL(Frame):
             pady=0,
             sticky=W,
             )
-# ... 'restore' directory
-        labelRestoreDirectory = Label(
-            frame_70,
-            text=(
-                'Local directory of BACKUP file:'
-                ),
-            bg=colorbg,
-            justify=RIGHT,
-            font=self.labelFontMedium,
-            )
-        labelRestoreDirectory.grid(
-            row=0,
-            column=0,
-            padx=0,
-            pady=1,
-            sticky=E,
-            )
-# ... 'restore' directory entry field
-        self.varRestoreDirName = StringVar()
-        self.entryRestoreDirName = Entry(
-            frame_70,
-            textvariable=self.varRestoreDirName,
-            background='white',
-            foreground='black',
-            width=30,
-            font=self.labelFontMedium,
-            )
-        self.entryRestoreDirName.grid(
-            row=0,
-            column=1,
-            padx=0,
-            pady=1,
-            sticky=W,
-            )
+            
 # ... 'restore' filename
         labelRestoreFilename = Label(
             frame_70,
             text=(
-                'using local BACKUP file:'
+                'Use file:'
                 ),
             bg=colorbg,
             justify=RIGHT,
             font=self.labelFontMedium,
             )
         labelRestoreFilename.grid(
-            row=1,
+            row=0,
             column=0,
             padx=0,
             pady=1,
@@ -3747,12 +3717,48 @@ class AccessMySQL(Frame):
             font=self.labelFontMedium,
             )
         self.entryRestoreFileName.grid(
+            row=0,
+            column=1,
+            padx=0,
+            pady=1,
+            sticky=W,
+            )
+            
+# ... 'restore' directory
+        labelRestoreDirectory = Label(
+            frame_70,
+            text=(
+                'from local directory:'
+                ),
+            bg=colorbg,
+            justify=RIGHT,
+            font=self.labelFontMedium,
+            )
+        labelRestoreDirectory.grid(
+            row=1,
+            column=0,
+            padx=0,
+            pady=1,
+            sticky=E,
+            )        
+# ... 'restore' directory entry field
+        self.varRestoreDirName = StringVar()
+        self.entryRestoreDirName = Entry(
+            frame_70,
+            textvariable=self.varRestoreDirName,
+            background='white',
+            foreground='black',
+            width=30,
+            font=self.labelFontMedium,
+            )
+        self.entryRestoreDirName.grid(
             row=1,
             column=1,
             padx=0,
             pady=1,
             sticky=W,
-            )      
+            )
+
 # ... browse button for restore
         buttonBrowseForRestoreFile = Button(
             frame_70,
