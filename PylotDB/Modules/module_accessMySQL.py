@@ -554,6 +554,47 @@ BUTTONLABEL_RANGE = 'Range ...'
 BUTTONLABEL_REORDERAUTOINDEX = 'Re-order\nauto_index'
 BUTTONLABEL_RESET = 'Reset'
 
+# ... MySQL keywords, used to compare with user-specified field headers to 
+# ...  check for conflicts
+MYSQL_KEYWORDS = ('ACCESSIBLE','ADD','ALL','ALTER','ANALYZE','AND',
+    'AS','ASC','ASENSITIVE','BEFORE','BETWEEN','BIGINT',
+    'BINARY','BLOB','BOTH','BY','CALL','CASCADE',
+    'CASE','CHANGE','CHAR','CHARACTER','CHECK','COLLATE',
+    'COLUMN','CONDITION','CONNECTION','CONSTRAINT','CONTINUE','CONVERT',
+    'CREATE','CROSS','CURRENT_DATE','CURRENT_TIME','CURRENT_TIMESTAMP','CURRENT_USER',
+    'CURSOR','DATABASE','DATABASES','DAY_HOUR','DAY_MICROSECOND','DAY_MINUTE',
+    'DAY_SECOND','DEC','DECIMAL','DECLARE','DEFAULT','DELAYED',
+    'DELETE','DESC','DESCRIBE','DETERMINISTIC','DISTINCT','DISTINCTROW',
+    'DIV','DOUBLE','DROP','DUAL','EACH','ELSE',
+    'ELSEIF','ENCLOSED','ESCAPED','EXISTS','EXIT','EXPLAIN',
+    'FALSE','FETCH','FLOAT','FLOAT4','FLOAT8','FOR',
+    'FORCE','FOREIGN','FROM','FULLTEXT','GOTO','GRANT',
+    'GROUP','HAVING','HIGH_PRIORITY','HOUR_MICROSECOND','HOUR_MINUTE','HOUR_SECOND',
+    'IF','IGNORE','IN','INDEX','INFILE','INNER',
+    'INOUT','INSENSITIVE','INSERT','INT','INT1','INT2',
+    'INT3','INT4','INT8','INTEGER','INTERVAL','INTO',
+    'IS','ITERATE','JOIN','KEY','KEYS','KILL',
+    'LABEL','LEADING','LEAVE','LEFT','LIKE','LIMIT',
+    'LINEAR','LINES','LOAD','LOCALTIME','LOCALTIMESTAMP','LOCK',
+    'LONG','LONGBLOB','LONGTEXT','LOOP','LOW_PRIORITY','MASTER_SSL_VERIFY_SERVER_CERT',
+    'MATCH','MEDIUMBLOB','MEDIUMINT','MEDIUMTEXT','MIDDLEINT','MINUTE_MICROSECOND',
+    'MINUTE_SECOND','MOD','MODIFIES','NATURAL','NOT','NO_WRITE_TO_BINLOG',
+    'NULL','NUMERIC','ON','OPTIMIZE','OPTION','OPTIONALLY',
+    'OR','ORDER','OUT','OUTER','OUTFILE','PRECISION',
+    'PRIMARY','PROCEDURE','PURGE','RANGE','READ','READS',
+    'READ_ONLY','READ_WRITE','REAL','REFERENCES','REGEXP','RELEASE',
+    'RENAME','REPEAT','REPLACE','REQUIRE','RESTRICT','RETURN',
+    'REVOKE','RIGHT','RLIKE','SCHEMA','SCHEMAS','SECOND_MICROSECOND',
+    'SELECT','SENSITIVE','SEPARATOR','SET','SHOW','SMALLINT',
+    'SPATIAL','SPECIFIC','SQL','SQLEXCEPTION','SQLSTATE','SQLWARNING',
+    'SQL_BIG_RESULT','SQL_CALC_FOUND_ROWS','SQL_SMALL_RESULT','SSL','STARTING','STRAIGHT_JOIN',
+    'TABLE','TERMINATED','THEN','TINYBLOB','TINYINT','TINYTEXT',
+    'TO','TRAILING','TRIGGER','TRUE','UNDO','UNION',
+    'UNIQUE','UNLOCK','UNSIGNED','UPDATE','UPGRADE','USAGE',
+    'USE','USING','UTC_DATE','UTC_TIME','UTC_TIMESTAMP','VALUES',
+    'VARBINARY','VARCHAR','VARCHARACTER','VARYING','WHEN','WHERE',
+    'WHILE','WITH','WRITE','XOR','YEAR_MONTH','ZEROFILL')
+
 # ===== main class ===== # 
 class AccessMySQL(Frame):
     def __init__(self, 
@@ -53735,22 +53776,23 @@ class AccessMySQL(Frame):
         tableRow = 0
 
 
-        for (num,i) in enumerate(indexAutoIndex):
+        for (inum,i) in enumerate(indexAutoIndex):
 #            tableRow=i
             tableColumn=0
             if DEBUG_PRINT_MISC:
-                print('\ni-1 = %s' % (i-1))
-                print('tableValues[i-1] for i-1 = %s:' % (i-1) )
+                print('\ni-1 = %s' % (inum-1))
+                print('tableValues[i-1] for i-1 = %s:' % (inum-1) )
 #                print('\n%s. %s' % (i-1,tableValues[i-1]))
-                print('\n%s. %s' % (i-1,tableValues[i-1]))
+                print('\n%s. %s' % (inum-1,tableValues[inum-1]))
+                
             for j in range(len(tableValues[0])):
                 tableColumn+=1
                 if DEBUG_PRINT_MISC:
-                    print('     tableValues[%s][%s] = %s' % (i-1,j,tableValues[i-1][j]))
+                    print('     tableValues[%s][%s] = %s' % (inum-1,j,tableValues[i-1][j]))
 # ... field 0      
                 labelFieldValues = Label(
                     self.frame_22_canvas,
-                    text=str(tableValues[i-1][j]),
+                    text=str(tableValues[inum-1][j]),
                     background='white',
                     foreground='black',
                     width=width_Field,
@@ -73703,42 +73745,54 @@ class AccessMySQL(Frame):
                             self.cursorHandleMySQL.execute(stringMySQLAdd)
                         except:
                             stringAddToDatabaseFailed = (
-                                'Attempt to add field\n\n' +
-                                '%s\n\n' +
-                                'after the field\n\n' +
-                                '%s\n\n' +
-                                'failed in \n\n' +
-                                '"' + MODULE + '/' + 'handlerExtractDataAndFillTable"\n\n' +
-                                'Error might be due to duplicate column names.\n\n' +
-                                'This should not have happened.\n\n' +
-                                'Contact code administrator for help with fixing this problem.\n\n'
-                                ) % (items, fieldNext2Last)
-                            if items == listMissingHeadersAndDatatype(len(listMissingHeadersAndDatatype) - 1):
-                                stringAddToDatabaseFailed += (
-                                    'THIS IS THE LAST COLUMN HEADER TO INSERT.\n\n' +
-                                    'CLICK "Yes" TO CONTINUE WITH DATA INSERTION PROCESS,\n' +
-                                    '  "No" TO CANCEL THIS PROCESS.'
+                                    '1. Attempt to add field\n\n' +
+                                    ' "%s"\n\n' +
+                                    'with datatype %s\n\n' +
+                                    'after the field\n\n' +
+                                    '  "%s"\n\n' +
+                                    'failed in \n\n' +
+                                    '"' + MODULE + '/' + 'handlerExtractDataAndFillTable"\n\n'
+                                    ) % (items.split(' ')[0],items.split(' ')[1],fieldNext2Last)
+
+                                if items.upper().split(' ')[0] in MYSQL_KEYWORDS:
+                                    stringAddToDatabaseFailed += (
+                                        'This field name conflicts with a MySQL keyword\n' +
+                                        '  and cannot be added to the table.\n\n' +
+                                        'Edit the input file(s) to modify the field name\n' +
+                                        '  and try again.\n\n'
+                                        )
+                                else:
+                                    stringAddToDatabaseFailed += (
+                                        'Error might be due to duplicate column names.\n\n' +
+                                        'This should not have happened.\n\n' +
+                                        'Contact code administrator for help with fixing this problem.\n\n'
+                                        )
+                                if items == listMissingHeadersAndDatatype(len(listMissingHeadersAndDatatype) - 1):
+                                    stringAddToDatabaseFailed += (
+                                        'THIS IS THE LAST COLUMN HEADER TO INSERT.\n\n' +
+                                        'CLICK "Yes" TO CONTINUE WITH DATA INSERTION PROCESS,\n' +
+                                        '  "No" TO CANCEL THIS PROCESS.'
+                                        )
+                                else:
+                                    stringAddToDatabaseFailed += (
+                                        'DO YOU WISH TO CONTINUE TRYING TO ADD COLUMN HEADERS?'
+                                        )
+                                print('\n' + stringAddToDatabaseFailed)
+                                self.MySQL_Output(
+                                    0,
+                                    stringAddToDatabaseFailed
                                     )
-                            else:
-                                stringAddToDatabaseFailed += (
-                                    'DO YOU WISH TO CONTINUE TRYING TO ADD COLUMN HEADERS?'
-                                    )
-                            print('\n' + stringAddToDatabaseFailed)
-                            self.MySQL_Output(
-                                0,
-                                stringAddToDatabaseFailed
-                                )
 #                            showerror(
 #                                'Error: invalid table alteration',
 #                                stringAddToDatabaseFailed,
 #                                parent=self.toplevelExtractAndFill
 #                                )
-                            ans = askyesno(
-                                'QUESTION',
-                                stringAddToDatabaseFailed
-                                )
-                            if not ans:
-                                return
+                                ans = askyesno(
+                                    'QUESTION',
+                                    stringAddToDatabaseFailed
+                                    )
+                                if not ans:
+                                    return
 
 # UPDATE TABLE VALUES USING 'UPDATE' STATEMENT                                
 # form table update statement using header names specifically; loop over list
@@ -75299,16 +75353,34 @@ class AccessMySQL(Frame):
                             self.cursorHandleMySQL.execute(stringMySQLAdd)
                         except:
                             stringAddToDatabaseFailed = (
-                                'Attempt to add field\n\n' +
-                                '%s\n\n' +
+                                '2. Attempt to add field\n\n' +
+                                '  "%s"\n\n' +
+                                'with datatype %s\n\n' +
                                 'after the field\n\n' +
-                                '%s\n\n' +
+                                '  "%s"\n\n' +
                                 'failed in \n\n' +
-                                '"' + MODULE + '/' + 'handlerExtractDataAndFillTable"\n\n' +
+                                '"' + MODULE + '/' + 'handlerExtractDataAndFillTable"\n\n'
+                                ) % (items.split(' ')[0],items.split(' ')[1],fieldNext2Last)
+                            
+                            if DEBUG_YAML:
+                                print("items.upper().split(' ')[0] = %s" % items.upper().split(' ')[0])
+                                print("len of above = %s" % len(items.upper().split(' ')[0]))
+                                print('MYSQL_KEYWORDS = ')
+                                print(MYSQL_KEYWORDS)
+                            
+                            if items.upper().split(' ')[0] in MYSQL_KEYWORDS:
+                                stringAddToDatabaseFailed += (
+                                    'This field name conflicts with a MySQL keyword\n' +
+                                    '  and cannot be added to the table.\n\n' +
+                                    'Edit the input file(s) to modify the field name\n' +
+                                    '  and try again.\n\n'
+                                    )
+                            else:
+                                stringAddToDatabaseFailed += (
                                 'Error might be due to duplicate column names.\n\n' +
                                 'This should not have happened.\n\n' +
                                 'Contact code administrator for help with fixing this problem.\n\n'
-                                ) % (items, fieldNext2Last)
+                                )
                             if items == listMissingHeadersAndDatatype[len(listMissingHeadersAndDatatype) - 1]:
                                 stringAddToDatabaseFailed += (
                                     '\n\nTHIS IS THE LAST COLUMN HEADER TO INSERT.\n\n'
