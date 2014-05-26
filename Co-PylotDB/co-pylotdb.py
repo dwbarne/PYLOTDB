@@ -120,7 +120,7 @@ DEBUG_CO_PYLOT_CONF_FILE = 0    # = 1, print variables related to reading or gen
 DEBUG_PRINTDISCONNECT = 0         # = 1, print variables related to disconnecting from server and re-setting various attributes
 DEBUG_PRINTMETHODNAME = 0       # = 1, print name of current method
 DEBUG_SAVEMYSQLCOMMAND = 0      # = 1, print variables related to saving the mysql command
-DEBUG_SHOWMYSQLCOMMAND = 0      # = 1, print mysqlcommand to be sent to mysql server
+DEBUG_SHOWMYSQLCOMMAND = 1      # = 1, print mysqlcommand to be sent to mysql server
 
 # ... stats
 DEBUG_THREAD_STATS = 0          # = 1, print variables from running thread to track usage
@@ -1793,7 +1793,7 @@ class AccessMySQL(Frame):
 # makefile
         self.labelMakeFile = Label(
             self.frameMySQL_20_03,
-            text='MAKE file\n(sample)',
+            text='MAKEFILE\n(sample)',
             justify=RIGHT,
             bg=self.colorbg,
             )
@@ -1869,7 +1869,7 @@ class AccessMySQL(Frame):
 # ... directory for make file
         self.labelMakeFileDirectory = Label(
             self.frameMySQL_20_03,
-            text='MAKE file dir',
+            text='MAKEFILE dir',
             justify=RIGHT,
             bg=self.colorbg,
             )
@@ -3253,11 +3253,11 @@ class AccessMySQL(Frame):
             self.filepathMake = tkFileDialog.askopenfilename(**options)
         except:
             stringError = (
-                'Cannot open the MAKE file'
+                'Cannot open MAKEFILE'
                 )
             print stringError
             showinfo(
-                'Error opening MAKE file',
+                'Error opening MAKEFILE',
                 stringError
                 )
             return
@@ -3290,12 +3290,12 @@ class AccessMySQL(Frame):
             self.fileMake = open(self.filepathMake,'r').read()
         except:
             stringError = (
-                'Cannot read the MAKE file\n\n' +
+                'Cannot read MAKEFILE\n\n' +
                 '%s\n\n'
                 ) % (filename)
             print stringError
             showinfo(
-                'Error reading MAKE file',
+                'Error reading MAKEFILE',
                 stringError
                 )
             return
@@ -3384,7 +3384,7 @@ class AccessMySQL(Frame):
                 )
             return
             
-        print 'contents of fileInput =\n',self.fileSource
+        print 'contents of fileSource =\n',self.fileSource
         
 # put name and directory into proper widgets
 #        self.varSourceFile.set(filename)
@@ -3728,6 +3728,10 @@ class AccessMySQL(Frame):
         dirname, filename = os.path.split(self.filepathQsub)
 # reset self.initialDir
         self.initialDir = dirname
+        
+        print '\n  Qsub dirname = ',dirname
+        print '\n  Qsub filename = ',filename
+        
         '''
 # get filename
         dirname, filename = os.path.split(
@@ -4094,6 +4098,50 @@ class AccessMySQL(Frame):
             print '\nallOutputFiles =\n\n', allOutputFiles
 # 
 
+# check all text files for special character " (double quote) and
+# \" (backslash + double quotes). 
+# If this exists in the file, add a backslash in front of the special
+#    character, i.e., \" if the special character is a double quote.
+# Files to check:
+#   1. INPUT file: self.fileInput --> inputFileContents
+#   2. MAKEFILE: self.fileMake --> makeFileContents
+#   3. SOURCE file: self.fileSource --> sourceFileContents
+#   4. QSUB file: self.fileQsub --> qsubFileContents
+# ... and taken care of farther below...
+#   5. OUTPUT file: self.scrolledtextOutputFile --> outputFileContents 
+
+# ... escape double quotes, and backslash double quotes,
+#    since they are considered special characters
+# ... inputFileContents
+        if '\\\"' in inputFileContents:
+            inputFileContents = inputFileContents.replace('\\\"','\\\\\\"')
+        elif '\"' in inputFileContents:
+            inputFileContents = inputFileContents.replace("\"","\\\"")
+        else:
+            pass
+# ... makeFileContents  
+        if '\\\"' in makeFileContents:
+            makeFileContents = makeFileContents.replace('\\\"','\\\\\\"')
+        elif '\"' in makeFileContents:     
+            makeFileContents = makeFileContents.replace("\"","\\\"")
+        else:
+            pass
+# ... sourceFileContents
+        if '\\\"' in sourceFileContents:
+            sourceFileContents = sourceFileContents.replace('\\\"','\\\\\\"')
+        elif '\"' in sourceFileContents:     
+            sourceFileContents = sourceFileContents.replace("\"","\\\"")
+        else:
+            pass
+# ... qsubFileContents
+        if '\\\"' in qsubFileContents:
+            qsubFileContents = qsubFileContents.replace('\\\"','\\\\\\"')
+        elif '\"' in qsubFileContents:     
+            qsubFileContents = qsubFileContents.replace("\"","\\\"")
+        else:
+            pass
+
+
 # print all variables
         if DEBUG:
             print('')
@@ -4246,6 +4294,18 @@ class AccessMySQL(Frame):
                         stringError
                         )
                     return
+                    
+#check for double quotes, and backslash with double quotes; 
+# use backslash to denote special character
+            if '\\\"' in outputFileContents:
+                outputFileContents = outputFileContents.replace('\\\"','\\\\\\"')
+            elif '\"' in outputFileContents:
+                outputFileContents = outputFileContents.replace('\"','\\\"')
+            else:
+                pass
+                
+# print output file
+#            print('\noutputFileContents:\n%s\n' % outputFileContents)
             
             if DEBUG:
                 print(
@@ -4839,7 +4899,7 @@ class AccessMySQL(Frame):
         'machineForExecutable = %s\n' + 
         'day_number_since_01jan2011 = %s\n' + 
         'dayofweek = %s\n' +
-        'month = %s\n' +
+        'mont/h = %s\n' +
         'dayofmonth = %s\n' +
         'year = %s\n' +
         'dateOfLastSend = %s\n' + 
@@ -5774,6 +5834,7 @@ class AccessMySQL(Frame):
         '''
         if DEBUG_PRINTMETHODNAME:
             print('\nClear SOURCE file and directory entries')
+            
 #        self.varSourceFile.set('')
         self.entrySourceFile.setvalue('')
         self.entrySourceFileDirectory.setvalue('') 
