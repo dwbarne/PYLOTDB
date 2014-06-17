@@ -196,7 +196,7 @@ DEBUG_MAXLINESTODISPLAY = 0     # = 1 print variables related to max lines to di
 DEBUG_PLOT_XY = 0                       # = 1 print variables related to X-Y Plot specs
 DEBUG_PLOT_SCATTER = 0              # = 1 print variables related to Scatter Plot specs
 DEBUG_PRINTFIRSTFEWROWS = 0      # = 1 print first few rows of table to command window
-DEBUG_PRINT_METHOD = 0                 # = 1 print which method PylotDB calls
+DEBUG_PRINT_METHOD = 1                # = 1 print which method PylotDB calls
 DEBUG_PRINT_MISC = 0                    # = 1 print miscellaneous output
 DEBUG_PRINT_MYSQLCOMMANDFORINSERT = 0   # = 1 print variables for inserting mysql command from co-PylotDB
 DEBUG_PRINT_PREVIEW_KIVIAT = 0          # = 1 print variables related to previewing kiviat diagram labels
@@ -231,13 +231,14 @@ DEBUG_USER_DEFINED_FIELDS = 0           # = 1 print some variables for user-defi
 DEBUG_USER_DEFINED_FIELDS_SCATTER = 0           # = 1 print some variables for user-defined fields for storage buffer from scatter plots
 DEBUG_VARXYSELECT = 0                   # = 1 prints variables related to re-defining self.varXSelect and self.varYSelect when reading in new table
 DEBUG_XY = 0                                # = yam print variables related to X-Y plots
-DEBUG_XY_LABELS = 0                     # = 1 print variables related to labels for X-Y plots
+DEBUG_XY_LABELS = 0                    # = 1 print variables related to labels for X-Y plots
 DEBUG_YAML = 0                          # = 1 detailed printout of yaml extraction process; = 0 suppress detailed output
 
 # ... Stats
 DEBUG_THREAD_STATS = 0                  # = 1 print variables related to stats thread
 DEBUG_THREAD_VARS = 0                   # = 1 print more variables related to stats thread
 THREAD_STATS_MYSQLACCESS = 1      # = 1 start thread for MySQLAccess stats info to database
+DEBUG_CONSTRUCTOR = 0                   # = 1 print variables defined in class constructor
 
 # for clearing selections from table after plotting specs window
 #   is displayed: 
@@ -644,6 +645,11 @@ class AccessMySQL(Frame):
                 self.userName = os.environ['USER']
             except:
                 self.userName = 'UNK'
+                
+        if DEBUG_CONSTRUCTOR:
+            print('\n self.userName = ' + self.userName)
+#            sys.exit()
+            
 # server connection        
         self.myDbConnection = 0
         
@@ -4021,7 +4027,7 @@ class AccessMySQL(Frame):
     def handlerEnterPasswordForBackupRestore(self):
         '''
         Purpose:
-        Entery password for backup and restore
+        Entry password for backup and restore
         
         NOTE: This method is not used at present
         '''
@@ -23054,7 +23060,7 @@ class AccessMySQL(Frame):
 # ... cancel button
         buttonCancel = Button(
             frame_60_CancelButton,
-            text='Cancel',
+            text='Close',
             borderwidth=5,
             width=15,
             relief=RAISED,
@@ -37262,7 +37268,7 @@ class AccessMySQL(Frame):
             bg=colorbg,
             )
         self.toplevelLabelsSinglePlotPerCurve.title(
-            'PLOT LABELS - SINGLE CURVE PER PLOT'
+            'PLOT LABELS - XY - SINGLE CURVE PER PLOT'
             )
 #        self.toplevelLabelsSinglePlotPerCurve.transient(self.toplevelTableValues)
         self.toplevelLabelsSinglePlotPerCurve.transient(self.toplevelXYPlotPreprocess)
@@ -38380,7 +38386,7 @@ class AccessMySQL(Frame):
         yHeaders.extend(self.headerNames_Y_Table)
         
         if DEBUG_XY_LABELS:
-            print(' yHeaders =\n')
+            print('\nyHeaders for X-Y plots in handlerShowXYLabelsTable =\n')
             print(yHeaders)        
 
 # determine plot label separator
@@ -38473,6 +38479,7 @@ class AccessMySQL(Frame):
                                     stringNoValue
                                     )
                             return
+                            
             if self.comboboxY2LabelSingleCurvePerPlotTable.get().strip() <> '':
                 field2 = self.comboboxY2LabelSingleCurvePerPlotTable.get().split('.')[1].strip()
                 for key,value in self.dictColumnHeaders.iteritems():
@@ -39341,7 +39348,7 @@ class AccessMySQL(Frame):
             bg=colorbg,
             )
         self.toplevelLegendLabelsAllCurvesOnePlot.title(
-            'LEGEND LABELS'
+            'LEGEND LABELS - XY - ALL CURVES ON ONE PLOT'
             )
 #        self.toplevelLegendLabelsAllCurvesOnePlot.transient(self.toplevelTableValues)
         self.toplevelLegendLabelsAllCurvesOnePlot.transient(self.toplevelXYPlotPreprocess)
@@ -40100,7 +40107,7 @@ class AccessMySQL(Frame):
             bg=colorbg,
             )
         self.toplevelLegendLabelsAllCurvesOnePlot_Scatter.title(
-            'LEGEND LABELS'
+            'LEGEND LABELS - SCATTER PLOT'
             )
 #        self.toplevelLegendLabelsAllCurvesOnePlot.transient(self.toplevelTableValues)
         self.toplevelLegendLabelsAllCurvesOnePlot_Scatter.transient(self.toplevelScatterPlotPreprocess)
@@ -40888,6 +40895,7 @@ class AccessMySQL(Frame):
                 i += 1
             j+=1 
         '''
+        yHeaders = []
         yHeaders = self.headerNames_Y_Table
         
         if DEBUG_XY_LABELS:
@@ -40905,6 +40913,7 @@ class AccessMySQL(Frame):
             print('self.headerNames_X_Table =\n%s' % self.headerNames_X_Table)
             print('self.headerNames_Y_Table =\n%s' % self.headerNames_Y_Table)
             print '-'*80
+#            sys.exit()
         
 # concatenate Y-label strings
         self.legendLabelStringTable = []
@@ -40913,8 +40922,12 @@ class AccessMySQL(Frame):
             if self.varCheckbuttonYHeaderLabelAllCurvesOnOnePlotTable.get():
                 legendLabelString = header
             if self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-#                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
-                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().strip()
+                field1 = self.comboboxLegend1LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                
+                if DEBUG_XY_LABELS:
+                    print("\n field1 = " + field1)
+#                    print ("\n self.dictColumnHeaders = \n" + self.dictColumnHeaders)
+                
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field1:
                         if(
@@ -40952,9 +40965,14 @@ class AccessMySQL(Frame):
                                     stringNoValue
                                     )
                             return
+                            
             if self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-#                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()                
-                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().strip()                
+                field2 = self.comboboxLegend2LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()    
+
+                if DEBUG_XY_LABELS:
+                    print("\n field2 = " + field2)
+#                    print ("\n self.dictColumnHeaders = \n" + self.dictColumnHeaders)
+                    
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field2:
                         if(
@@ -40992,9 +41010,14 @@ class AccessMySQL(Frame):
                                     stringNoValue
                                     )
                             return
+                            
             if self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip() <> '':
-#                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
-                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().strip()
+                field3 = self.comboboxLegend3LabelAllCurvesOnOnePlotTable.get().split('.')[1].strip()
+                
+                if DEBUG_XY_LABELS:
+                    print("\n field3 = " + field1)
+#                    print ("\n self.dictColumnHeaders = \n" + self.dictColumnHeaders)
+                    
                 for key,value in self.dictColumnHeaders.iteritems():
                     if key == field3:
                         if(
@@ -41040,6 +41063,13 @@ class AccessMySQL(Frame):
                     legendLabelString = self.entryfieldLegendUserLabelAllCurvesOnOnePlotTable.get().strip()
             
             self.legendLabelStringTable.append(legendLabelString)
+            
+            if DEBUG_XY_LABELS:
+                if self.entryfieldLegendUserLabelAllCurvesOnOnePlotTable.get().strip() <> '':
+                    print("\n legend string label = " + legendLabelString)
+                    print("\n Final string =")
+                    print(self.legendLabelStringTable)
+#                    sys.exit()
             
 # show string in LEGEND LABEL field
         self.entryfieldLegendLabelShowTable.setvalue(self.legendLabelStringTable[0])
@@ -73754,45 +73784,45 @@ class AccessMySQL(Frame):
                                     '"' + MODULE + '/' + 'handlerExtractDataAndFillTable"\n\n'
                                     ) % (items.split(' ')[0],items.split(' ')[1],fieldNext2Last)
 
-                                if items.upper().split(' ')[0] in MYSQL_KEYWORDS:
-                                    stringAddToDatabaseFailed += (
-                                        'This field name conflicts with a MySQL keyword\n' +
-                                        '  and cannot be added to the table.\n\n' +
-                                        'Edit the input file(s) to modify the field name\n' +
-                                        '  and try again.\n\n'
-                                        )
-                                else:
-                                    stringAddToDatabaseFailed += (
-                                        'Error might be due to duplicate column names.\n\n' +
-                                        'This should not have happened.\n\n' +
-                                        'Contact code administrator for help with fixing this problem.\n\n'
-                                        )
-                                if items == listMissingHeadersAndDatatype(len(listMissingHeadersAndDatatype) - 1):
-                                    stringAddToDatabaseFailed += (
-                                        'THIS IS THE LAST COLUMN HEADER TO INSERT.\n\n' +
-                                        'CLICK "Yes" TO CONTINUE WITH DATA INSERTION PROCESS,\n' +
-                                        '  "No" TO CANCEL THIS PROCESS.'
-                                        )
-                                else:
-                                    stringAddToDatabaseFailed += (
-                                        'DO YOU WISH TO CONTINUE TRYING TO ADD COLUMN HEADERS?'
-                                        )
-                                print('\n' + stringAddToDatabaseFailed)
-                                self.MySQL_Output(
-                                    0,
-                                    stringAddToDatabaseFailed
+                            if items.upper().split(' ')[0] in MYSQL_KEYWORDS:
+                                stringAddToDatabaseFailed += (
+                                    'This field name conflicts with a MySQL keyword\n' +
+                                    '  and cannot be added to the table.\n\n' +
+                                    'Edit the input file(s) to modify the field name\n' +
+                                    '  and try again.\n\n'
                                     )
+                            else:
+                                stringAddToDatabaseFailed += (
+                                    'Error might be due to duplicate column names.\n\n' +
+                                    'This should not have happened.\n\n' +
+                                    'Contact code administrator for help with fixing this problem.\n\n'
+                                    )
+                            if items == listMissingHeadersAndDatatype(len(listMissingHeadersAndDatatype) - 1):
+                                stringAddToDatabaseFailed += (
+                                    'THIS IS THE LAST COLUMN HEADER TO INSERT.\n\n' +
+                                    'CLICK "Yes" TO CONTINUE WITH DATA INSERTION PROCESS,\n' +
+                                    '  "No" TO CANCEL THIS PROCESS.'
+                                    )
+                            else:
+                                stringAddToDatabaseFailed += (
+                                    'DO YOU WISH TO CONTINUE TRYING TO ADD COLUMN HEADERS?'
+                                    )
+                            print('\n' + stringAddToDatabaseFailed)
+                            self.MySQL_Output(
+                                0,
+                                stringAddToDatabaseFailed
+                                )
 #                            showerror(
 #                                'Error: invalid table alteration',
 #                                stringAddToDatabaseFailed,
 #                                parent=self.toplevelExtractAndFill
 #                                )
-                                ans = askyesno(
-                                    'QUESTION',
-                                    stringAddToDatabaseFailed
-                                    )
-                                if not ans:
-                                    return
+                            ans = askyesno(
+                                'QUESTION',
+                                stringAddToDatabaseFailed
+                                )
+                            if not ans:
+                                return
 
 # UPDATE TABLE VALUES USING 'UPDATE' STATEMENT                                
 # form table update statement using header names specifically; loop over list

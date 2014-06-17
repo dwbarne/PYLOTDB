@@ -93,9 +93,11 @@ if os.name == 'posix':
     if DEBUG_MODULE_PATH:
         print('...appended ' + pylotdbHOME +'/Modules to path')
 elif os.name == 'nt':
-    sys.path.append('.\\Modules')
+    moduleDirectoryFullPath = os.getcwd() + '\\Modules'
+    sys.path.append(moduleDirectoryFullPath)
     if DEBUG_MODULE_PATH:
-        print('...appended .\\Modules to path')
+        print('...appended to path: ' + moduleDirectoryFullPath)
+#        sys.exit()
 else:
     showerror(
         'Error: module path',
